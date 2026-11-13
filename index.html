@@ -2,7 +2,7 @@
 <html lang="de-AT">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>KI-Dorf</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -210,6 +210,17 @@ a{color:var(--accent)}
 .vbar{display:flex;gap:10px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .world{position:relative;height:clamp(380px,64vh,620px);border-radius:28px;overflow:hidden;background:linear-gradient(var(--sky),var(--sky-2))}
 .world:focus{outline:none}
+/* Vollbild: das 3D-Fenster füllt den ganzen Bildschirm. Echtes Vollbild, wo der Browser es kann, sonst nur die Seite ausfüllen. */
+.fs-btn{position:absolute;top:12px;right:12px;z-index:2;font:700 .85rem/1.2 var(--body);padding:8px 12px;border-radius:99px;border:2px solid var(--accent);background:var(--panel);color:var(--accent);cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.1)}
+.fs-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.whelp{padding-right:130px}
+html.fs-lock,html.fs-lock body{overflow:hidden}
+.world.fs{position:fixed;inset:0;z-index:1000;height:100%;width:100%;border-radius:0;margin:0}
+.h3d .world.fs,.world.fs{height:100%}
+.world.fs .acts{bottom:max(14px,env(safe-area-inset-bottom,0px));right:max(14px,env(safe-area-inset-right,0px))}
+.world.fs .joy{bottom:max(16px,env(safe-area-inset-bottom,0px));left:max(16px,env(safe-area-inset-left,0px))}
+.world.fs .fs-btn{top:max(12px,env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px))}
+.world.fs .whelp{top:max(12px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px))}
 .world:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 .world canvas{display:block;width:100%;height:100%;touch-action:none;cursor:pointer}
 .world.loading{display:grid;place-items:center;font-weight:800;color:var(--ink-soft)}
@@ -805,30 +816,31 @@ var HOUSES=[
   id:'bahnhof', slot:8, route:'bahnhof', name:'Bahnhof mit Remise', block:'Skills, Plug-ins, Automatisierungen', stand:'Oktober 2026',
   look:{wall:'wall-1', roof:'roof-1', roofType:'gable', special:'train', w:6.2, kind:'station'},
   fund:{
-    title:'Was hier fährt',
-    intro:'Im Bahnhof sind die Bausteine für wiederkehrende Arbeit versammelt. Jedes Gleis und jedes Gebäude steht für etwas, das du später in deinem KI-Tool einrichtest.',
+    title:'Bausteine für wiederkehrende Arbeit',
+    intro:'Im Bahnhof sind die Bausteine für wiederkehrende Arbeit versammelt. Vorn stehen die Fachbegriffe, die du in deinem KI-Tool findest. Das Bahnhofsbild dahinter hilft beim Merken. Im Quiz kommen nur die Fachbegriffe vor.',
     items:[
-      {k:'Fahrplan',v:'Eine Aufgabe, die zu festen Zeiten von selbst startet, zum Beispiel ein Morgenüberblick um 7 Uhr.'},
-      {k:'Gleise',v:'Konnektoren. Sie verbinden das KI-Tool mit deinem Kalender, Postfach oder Dokumentenordner.'},
-      {k:'Zug',v:'Ein Skill. Eine gespeicherte Arbeitsanweisung, die jedes Mal gleich abgefahren wird.'},
-      {k:'Zugverband',v:'Ein Plug-in. Mehrere Skills und Verbindungen, als Paket für einen Arbeitsbereich gebündelt.'},
-      {k:'Stellwerk',v:'Rechte und Kontrolle. Hier legst du fest, was fahren darf: nur lesen, nichts senden oder löschen ohne deine Bestätigung.'},
-      {k:'Remise',v:'Die Werkstatt für deine eigenen Skills. Hier baust, testest und wartest du sie.'},
-      {k:'Fremde Züge',v:'Skills und Plug-ins von anderen prüfst du vor dem Einsetzen: Wer hat sie veröffentlicht, unter welcher Lizenz, wann zuletzt geändert, was tun sie genau? Nie blind installieren.'}
+      {k:'Geplante Aufgabe',v:'Eine Aufgabe, die zu festen Zeiten von selbst startet, zum Beispiel ein Morgenüberblick um 7 Uhr. Im Bild: der Fahrplan.'},
+      {k:'Konnektor',v:'Eine Verbindung zwischen KI-Tool und App. So kann das Tool deinen Kalender, dein Postfach oder deinen Dokumentenordner nutzen. Im Bild: die Gleise.'},
+      {k:'Skill',v:'Eine gespeicherte Arbeitsanweisung, die jedes Mal gleich abläuft. Im Bild: der Zug.'},
+      {k:'Plug-in',v:'Ein Paket aus mehreren Skills und Verbindungen für einen Arbeitsbereich. Im Bild: der Zugverband.'},
+      {k:'Rechte und Bestätigungen',v:'Hier legst du fest, was die KI darf: nur lesen, nichts senden oder löschen ohne deine Bestätigung. Im Bild: das Stellwerk.'},
+      {k:'Eigener Skill',v:'Einen Skill baust, testest und pflegst du selbst. Im Bild: die Remise.'},
+      {k:'Fremde Skills und Plug-ins',v:'Was andere veröffentlicht haben, prüfst du vor dem Einsetzen: Wer steht dahinter, unter welcher Lizenz, wann zuletzt geändert, was tut es genau? Nie blind installieren.'}
     ],
     note:'Namen und Funktionen unterscheiden sich je nach Tool und Tarif, manche fehlen ganz. Kläre vor dem Einrichten mit deiner IT, was bei dir freigegeben ist.'
   },
   bau:[{
     type:'match',
-    title:'Was fährt wo?',
-    intro:'Ordne jede Situation dem passenden Teil des Bahnhofs zu.',
-    options:['Fahrplan','Gleise','Zug (Skill)','Stellwerk','Remise'],
+    title:'Welcher Baustein ist das?',
+    intro:'Ordne jede Situation dem passenden Fachbegriff zu. Alle Beispiele sind erfunden.',
+    options:['Skill','Plug-in','Konnektor','Geplante Aufgabe','Rechte und Bestätigungen'],
     items:[
-      {q:'Eine feste Anleitung, wie meine Recherche mit Quellen abläuft.',a:'Zug (Skill)',why:'Eine wiederverwendbare Arbeitsanweisung ist ein Skill.'},
-      {q:'Jeden Morgen um 7 Uhr entsteht ein Überblick über meinen Tag.',a:'Fahrplan',why:'Zeitgesteuerte, wiederkehrende Aufgaben laufen nach Fahrplan.'},
-      {q:'Die KI darf nichts senden, ohne dass ich bestätige.',a:'Stellwerk',why:'Rechte und Bestätigungen regelst du im Stellwerk.'},
-      {q:'Die KI kann meinen Kalender lesen.',a:'Gleise',why:'Die Verbindung zu einer App ist ein Konnektor, also ein Gleis.'},
-      {q:'Ich ändere meinen eigenen Skill und teste ihn.',a:'Remise',why:'Eigene Skills werden in der Remise gebaut und gewartet.'}
+      {q:'Eine gespeicherte Arbeitsanweisung für die Recherche mit Quellen, die jedes Mal gleich abläuft.',a:'Skill',why:'Eine wiederverwendbare Arbeitsanweisung ist ein Skill.'},
+      {q:'Jeden Morgen um 7 Uhr entsteht von selbst ein Überblick über meinen Tag.',a:'Geplante Aufgabe',why:'Aufgaben, die zu festen Zeiten von selbst starten, sind geplante Aufgaben.'},
+      {q:'Die KI darf nichts senden und nichts löschen, ohne dass ich bestätige.',a:'Rechte und Bestätigungen',why:'Was die KI darf und wann sie nachfragen muss, regelst du über Rechte und Bestätigungen.'},
+      {q:'Die KI kann meinen Kalender lesen.',a:'Konnektor',why:'Die Verbindung zwischen KI-Tool und App ist ein Konnektor.'},
+      {q:'Ein Paket für die Buchhaltung, das mehrere Skills und Verbindungen zu Postfach und Ablage bündelt.',a:'Plug-in',why:'Mehrere Skills und Verbindungen als Paket für einen Arbeitsbereich sind ein Plug-in.'},
+      {q:'Die KI soll Dokumente aus meinem Ablageordner öffnen können.',a:'Konnektor',why:'Der Zugriff auf Ordner und Apps läuft über Konnektoren.'}
     ]
   },{
     type:'self',
@@ -853,7 +865,7 @@ var HOUSES=[
       'Ich habe eine Aufgabe gewählt, die regelmäßig wiederkehrt.',
       'Ich prüfe das Ergebnis nach einer Woche und passe an oder schalte ab.'
     ],
-    tplTitle:'Regeln fürs Stellwerk',
+    tplTitle:'Regeln für Rechte und Bestätigungen',
     tpl:['Regeln für meine Automatisierungen','- Nur lesen, nichts senden, nichts löschen.','- Ergebnisse als Entwurf anlegen, ich gebe frei.','- Quellen mit Titel, Datum und Link angeben.','- Verwende keine vertraulichen oder personenbezogenen Daten, außer ich gebe sie ausdrücklich frei.'].join('\n'),
     note:'Die Regeln senken das Risiko, schließen es aber nicht aus. Ob dein Tool sie befolgt, prüfst du an echten Aufgaben.'
   }
@@ -921,7 +933,7 @@ var HOUSES=[
       {k:'Schreibstube',v:'Dein Stilprofil entsteht nur aus deinen eigenen Texten.'},
       {k:'Archiv',v:'Jede Quelle öffnen und die Aussage im Original finden.'},
       {k:'Atelier',v:'Bearbeitbares Design oder fertiges Bild wählen und immer die Rechte prüfen.'},
-      {k:'Bahnhof',v:'Wiederkehrendes automatisieren und die Rechte im Stellwerk eng halten.'},
+      {k:'Bahnhof',v:'Wiederkehrendes automatisieren und die Rechte eng halten.'},
       {k:'Labor',v:'Mit Kopien arbeiten und nichts blind ausführen.'}
     ],
     note:'Das Spiel selbst sendet nichts. Dein Feedback gibst du über das Formular in der Einrichtung oder auf dem Weg ab, den die Seminarleitung nennt.'
@@ -1217,7 +1229,7 @@ var FIGS=['roof-2','roof-1','roof-3','roof-4','roof-5'], FIG_NAMES=['Koralle','B
 var World=(function(){
   var T, ready=null, el, canvas, renderer, scene, camera, hemi, sun, ray, ground, welcome;
   var mats={}, geos={}, HS={}, colliders=[], anims=[], puffs=[], spinners=[], clouds=[], dusts=[], pick=[], trees=[], falls=[], plates=[];
-  var nearTree=-1, nearKey='', tipEl;
+  var nearTree=-1, nearKey='', tipEl, fsBtn, fsWanted=false;
   var mode='village', room=null, rooms={}, lightSets=[], curR=null, cur=null, busy=null, doorFlag=false, snapCam=true, altBtn;
   /* Gebaute Stufen und ausgepackte Möbel merkt sich nur der Browser (Komfort, nicht im Spielstand-Code) */
   var built={}, placed={}, KEY_BUILT='ki-dorf-gebaut';
@@ -1796,7 +1808,7 @@ var World=(function(){
     var sc=active();if(player.parent!==sc){sc.add(player);}
     var nm=m==='room'?BYID[id].name:'';
     el.setAttribute('aria-label',m==='room'?'Im Haus: '+nm:'KI-Dorf in 3D');
-    el.querySelector('.whelp').innerHTML='<span class="chip k-fine">Laufen: Pfeiltasten oder WASD</span><span class="chip k-fine">'+(m==='room'?'Enter: lesen, lösen, bauen, auspacken':'Enter: betreten, bauen, Baum schütteln')+'</span><span class="chip k-touch">Joystick oder hintippen</span>';
+    el.querySelector('.whelp').innerHTML='<span class="chip k-fine">Laufen: Pfeiltasten oder WASD</span><span class="chip k-fine">Vollbild: F</span><span class="chip k-fine">'+(m==='room'?'Enter: lesen, lösen, bauen, auspacken':'Enter: betreten, bauen, Baum schütteln')+'</span><span class="chip k-touch">Joystick oder hintippen</span>';
     el.querySelector('#worldHelp').textContent=m==='room'?
       'Du bist im Haus '+nm+'. Mit den Pfeiltasten oder W, A, S, D läufst du. Am Lesepult liest du das Fundament, am Bautisch löst du die Aufgabe, an der Möbelkiste öffnest du die Einrichtung. Ist ein Abschnitt gelöst, baust du an der Baustelle in der Raummitte mit Enter. Kartons packst du mit Enter aus. An der Tür gehst du mit Enter hinaus. Der Text zum Abschnitt steht neben dem Raum, mit der Tabulatortaste kommst du hin.':
       'Klick ins Dorf oder geh mit der Tabulatortaste hinein. Mit den Pfeiltasten oder W, A, S, D läufst du. Vor einer Haustür trittst du mit Enter ein. Steht dort „Bauen!“, baust du mit Enter weiter und öffnest die Tür mit E. Neben einem Baum schüttelst du ihn mit Enter, dann fällt ein Tipp herunter. Die Liste unter dem Dorf führt ebenfalls in jedes Haus.';
@@ -1968,6 +1980,28 @@ var World=(function(){
   }
 
   function say(t){if(live){live.textContent=t;}}
+  /* Vollbild: Der Zustand gehört dem Spiel, nicht dem Element. Beim Betreten eines Hauses wird das 3D-Fenster neu eingesetzt,
+     darum geht das echte Vollbild über die ganze Seite (documentElement) und das Fenster füllt sie per CSS. */
+  function fsReal(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+  function fsApply(){
+    if(!el){return;}
+    el.classList.toggle('fs',fsWanted);
+    document.documentElement.classList.toggle('fs-lock',fsWanted);
+    if(fsBtn){fsBtn.setAttribute('aria-pressed',fsWanted?'true':'false');fsBtn.textContent=fsWanted?'Vollbild beenden':'Vollbild';}
+    resize();
+  }
+  function setFs(on,quiet){
+    fsWanted=!!on;fsApply();
+    var d=document.documentElement;
+    try{
+      if(on&&!fsReal()){var rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq){var p=rq.call(d);if(p&&p.catch){p.catch(function(){});}}}
+      if(!on&&fsReal()){var ex=document.exitFullscreen||document.webkitExitFullscreen;if(ex){var q=ex.call(document);if(q&&q.catch){q.catch(function(){});}}}
+    }catch(e){}
+    if(!quiet){say(on?'Vollbild an. Mit Escape oder der Taste F beendest du es.':'Vollbild beendet.');}
+    if(el&&el.isConnected&&el.focus){el.focus({preventScroll:true});}
+  }
+  /* Beendet der Browser das Vollbild selbst (Escape), zieht das Spiel nach */
+  function onFsChange(){if(fsWanted&&!fsReal()){setFs(false,true);say('Vollbild beendet.');}}
   function go(id){var H=HS[id];if(H){doorFlag=true;location.hash='#'+H.h.route;}}
   function setLevel(H,l){H.lv[0].visible=l===0;for(var k=1;k<4;k++){H.lv[k].visible=l>=k;H.lv[k].scale.set(1,1,1);}H.spr.position.y=l>=2?H.lh:1.9;}
   function syncLevels(){
@@ -2124,7 +2158,8 @@ var World=(function(){
       if(k){keys[k]=true;target=null;e.preventDefault();return;}
       if((e.key==='Enter'||e.key===' ')&&cur){e.preventDefault();act();return;}
       if((e.key==='e'||e.key==='E')&&cur){e.preventDefault();actAlt();return;}
-      if(e.key==='Escape'&&!tipEl.hidden){tipEl.hidden=true;}
+      if(e.key==='Escape'){if(!tipEl.hidden){tipEl.hidden=true;}else if(fsWanted){e.preventDefault();setFs(false);}return;}
+      if(e.key==='f'||e.key==='F'){e.preventDefault();setFs(!fsWanted);return;}
     });
     el.addEventListener('keyup',function(e){var k=KM[e.key];if(k){keys[k]=false;}});
     el.addEventListener('blur',function(){keys={};});
@@ -2163,10 +2198,13 @@ var World=(function(){
       '<div class="whelp" aria-hidden="true"><span class="chip k-fine">Laufen: Pfeiltasten oder WASD</span><span class="chip k-fine">Haus betreten oder Baum schütteln: Enter</span><span class="chip k-touch">Joystick oder hintippen</span></div>'+
       '<p class="sr" id="worldHelp">Klick ins Dorf oder geh mit der Tabulatortaste hinein. Mit den Pfeiltasten oder W, A, S, D läufst du. Vor einer Haustür trittst du mit Enter ein. Neben einem Baum schüttelst du ihn mit Enter, dann fällt ein Tipp herunter. Die Liste unter dem Dorf führt ebenfalls in jedes Haus.</p>'+
       '<p class="sr" aria-live="polite" id="worldLive"></p>'+
+      '<button class="fs-btn" type="button" aria-pressed="false">Vollbild</button>'+
       '<div class="tipcard" hidden><p class="tag tipc-n">Tipp vom Baum</p><p class="tipc-t"></p><p class="tipc-m"></p><button type="button" class="tipc-x" aria-label="Tipp schließen">×</button></div>'+
       '<div class="acts"><button class="act-alt" type="button" hidden></button><button class="enter-btn" type="button" hidden></button></div>'+
       '<div class="joy" aria-hidden="true"><i></i></div>');
-    live=el.querySelector('#worldLive');enterBtn=el.querySelector('.enter-btn');altBtn=el.querySelector('.act-alt');tipEl=el.querySelector('.tipcard');joyEl=el.querySelector('.joy');joyKnob=joyEl.querySelector('i');
+    live=el.querySelector('#worldLive');enterBtn=el.querySelector('.enter-btn');altBtn=el.querySelector('.act-alt');tipEl=el.querySelector('.tipcard');fsBtn=el.querySelector('.fs-btn');
+    fsBtn.addEventListener('click',function(){setFs(!fsWanted);});
+    document.addEventListener('fullscreenchange',onFsChange);document.addEventListener('webkitfullscreenchange',onFsChange);joyEl=el.querySelector('.joy');joyKnob=joyEl.querySelector('i');
     scene=new T.Scene();scene.background=new T.Color();scene.fog=new T.Fog(0xffffff,60,130);
     camera=new T.PerspectiveCamera(42,1.6,.5,260);
     hemi=new T.HemisphereLight(0xffffff,0x9db585,.42);scene.add(hemi);
@@ -2198,7 +2236,7 @@ var World=(function(){
       slot.parentNode.replaceChild(el,slot);
       reconcile();
       var h=currentHouse();setMode(h?'room':'village',h?h.id:null);
-      resize();applyTheme();
+      fsApply();applyTheme();
       if(mode==='room'){roomSync(room,true);}else{syncLevels();}
       near=null;nearTree=-1;nearKey='';cur=null;enterBtn.hidden=true;altBtn.hidden=true;tipEl.hidden=true;
       if(snapCam){cam(0,true);snapCam=false;}
@@ -2209,12 +2247,14 @@ var World=(function(){
     hasFocus:function(){return !!el&&document.activeElement===el;},
     pending:function(id){return ready?pending(id):null;},
     adopt:function(){if(ready){ORDER.forEach(function(id){built[id]=-1;});}},
-    detach:function(){running=false;if(raf){cancelAnimationFrame(raf);raf=0;}keys={};joy.x=joy.z=0;},
+    fullscreen:function(on){if(el){setFs(on);}},
+    isFullscreen:function(){return fsWanted;},
+    detach:function(){if(fsWanted){setFs(false,true);}running=false;if(raf){cancelAnimationFrame(raf);raf=0;}keys={};joy.x=joy.z=0;},
     placeAt:function(id){var H=HS[id];if(H){pl.x=H.door.x;pl.z=H.door.z+.3;pl.face=0;target=null;snapCam=true;}},
     focus:function(){if(el&&el.isConnected&&el.focus){el.focus({preventScroll:true});}},
     setFig:function(f){if(FIGS.indexOf(f)<0){return;}fig=f;if(P.torso){P.torso.material=mat(f);}try{localStorage.setItem(KEY_FIG,f);}catch(e){}},
     fig:function(){return fig;},
-    debug:function(){return {x:+pl.x.toFixed(2),z:+pl.z.toFixed(2),near:near,nearTree:nearTree,falls:falls.length,shown:JSON.stringify(shown),mode:mode,room:room&&room.id,built:JSON.stringify(built),placed:JSON.stringify(placed),cur:cur&&cur.label,busy:!!busy};},
+    debug:function(){return {x:+pl.x.toFixed(2),z:+pl.z.toFixed(2),near:near,nearTree:nearTree,falls:falls.length,shown:JSON.stringify(shown),mode:mode,room:room&&room.id,built:JSON.stringify(built),placed:JSON.stringify(placed),cur:cur&&cur.label,busy:!!busy,fs:fsWanted,fsClass:!!(el&&el.classList.contains('fs')),fsReal:fsReal()};},
     testPlace:function(x,z){pl.x=x;pl.z=z;target=null;},
     trees:function(){return trees.map(function(t){return {x:t.x,z:t.z,s:t.s};});},
     simulate:function(sec){for(var t=0;t<sec;t+=.05){step(.05);}tsec+=sec;work(sec);animPlayer(tsec);checkNear();runAnims(sec);ambient(sec,tsec);cam(1,true);renderer.render(active(),camera);}
@@ -2352,6 +2392,8 @@ function refreshHouseText(){
 /* Wird aus dem Raum aufgerufen, wenn die Figur an einer Station Enter drückt */
 function openStage(i){
   if(!currentHouse()){return;}
+  /* Der Text steht neben dem Raum. Im Vollbild ist er verdeckt, darum geht das Vollbild hier zu. */
+  if(World.isFullscreen()){World.fullscreen(false);}
   ui.stage=i;ui.result=null;render();
   var st=document.getElementById('stage');
   if(st&&window.innerWidth<=820){
