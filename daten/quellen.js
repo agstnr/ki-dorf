@@ -60,6 +60,29 @@ KD.SRC_LERN = [
   ['W3C (2023). Web Content Accessibility Guidelines (WCAG) 2.2.', 'https://www.w3.org/TR/WCAG22/', 'Barrierefreiheit']
 ];
 
+/* Impressum und Hinweise. Hier ergänzen, was rechtlich nötig ist (zum Beispiel Anschrift und Kontakt). */
+KD.IMPRESSUM = {
+  name: 'Aisha Gstöttner',
+  zeilen: [],
+  zweck: 'Das KI-Dorf ist ein Begleitspiel zum KI-Seminar. Es ist kostenlos und enthält keine Werbung.',
+  hinweise: [
+    'Alle Beispiele in den Aufgaben sind erfunden.',
+    'Angaben zu Tools haben den Stand ' + KD.STAND + ' und ändern sich. Für Claude wurden sie am ' + KD.ABRUF + ' an den Seiten des Anbieters geprüft, für andere Tools nicht einzeln.',
+    'Das Dorf ist keine Rechtsberatung und ersetzt keine interne Vorgabe.'
+  ],
+  daten: [
+    'Das Dorf sendet nichts und kennt keine Konten. Es speichert nur in diesem Browser: Lernstand, Einstellungen, angehakte Checklisten, gesammelte Tipps und die Wörter der Wordcloud. Keine Namen, keine Antworttexte.',
+    'Im Menü lässt sich alles mit einem Knopf löschen.',
+    'Die Seite liegt bei GitHub Pages. Beim Abruf fallen dort technisch nötige Verbindungsdaten an. Wer das Dorf als Ordner vom eigenen Gerät öffnet, braucht keine Verbindung.',
+    'Links zu Quellen und zum Feedback-Formular öffnen fremde Seiten erst nach einem Klick.'
+  ],
+  lizenzen: [
+    'three.js r187: MIT-Lizenz, Copyright 2010–2026 three.js authors, threejs.org. Der Lizenztext liegt im Ordner vendor.',
+    'Schriften Fredoka und Nunito: SIL Open Font License 1.1.',
+    'Icons, Infografiken, Texte und Aufgaben wurden für dieses Spiel erstellt.'
+  ]
+};
+
 /* Dorfbewohner:innen. farbe = Farbname aus dem CSS, pos = Platz im 3D-Dorf */
 KD.NPCS = [
   {id: 'mira', name: 'Mira', beruf: 'Briefträgerin', farbe: 'c-coral', pos: [-4.2, 20.2], hallo: 'Ich komme überall vorbei. Frag mich, wenn du nicht weißt, wo du anfangen sollst.'},

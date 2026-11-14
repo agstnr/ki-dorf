@@ -9,6 +9,7 @@ function doneOf(id){var l=lvl(id);return [l>=1,l>=2,l>=3];}
 function layoutAt(i){return HOUSES[i].spot;}
 var hasGL=(function(){try{var c=document.createElement('canvas');return !!(window.WebGLRenderingContext&&(c.getContext('webgl2')||c.getContext('webgl')));}catch(e){return false;}})();
 KD.World=(function(){
+  var HARBOUR={px:32.3,pz:-4.5};
   var T, ready=null, el, canvas, renderer, scene, camera, hemi, sun, ray, ground, welcome;
   var mats={}, geos={}, HS={}, colliders=[], anims=[], puffs=[], spinners=[], clouds=[], dusts=[], pick=[], trees=[], falls=[], plates=[];
   var nearTree=-1, nearKey='', tipEl, fsBtn, fsWanted=false;
@@ -18,7 +19,7 @@ KD.World=(function(){
   var player, P={}, pl={x:0,z:19.8,face:Math.PI,phase:0,walk:0}, target=null, stuck=0;
   var keys={}, joy={x:0,z:0}, near=null, shown={}, running=false, raf=0, clk=0, tsec=0;
   var live, enterBtn, joyEl, joyKnob, fig='roof-2', OFF={y:13,z:15.5}, R=.42;
-  var paused=false, lastHid=null, npcs=[], deko=[], posTick=0;
+  var paused=false, lastHid=null, npcs=[], deko=[], posTick=0, armed=false;
 
   function cvTex(c){var t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t;}
   function tok(n){return getComputedStyle(document.documentElement).getPropertyValue('--'+n).trim()||'#888888';}
@@ -94,14 +95,7 @@ KD.World=(function(){
   };
   var SPECIAL={
     train:function(c,h){
-      var tz=c.d/2+1.35, x0=-c.w/2-4, x1=c.w/2+4, k;
-      M(box(x1-x0,.08,.08),mat('stone-d'),(x0+x1)/2,.06,tz-.36,c.g1,true);M(box(x1-x0,.08,.08),mat('stone-d'),(x0+x1)/2,.06,tz+.36,c.g1,true);
-      for(k=x0+.3;k<x1;k+=.75){M(box(.22,.05,1.05),mat('wood'),k,.03,tz,c.g1,true);}
-      /* Remise */
-      var rx=c.w/2+1.9, rz=-.6, rg=new T.Group();rg.position.set(rx,0,rz);c.g2.add(rg);
-      M(rbox(2.6,2.1,2.8,.22),mat('wall-2'),0,0,0,rg);roof('gable',rg,2.6,2.8,2.1,mat('roof-1d'),mat('roof-1'));
-      M(archG(1.4,1.7,.1),mat('door'),0,0,1.36,rg);
-      colliders.push({x:c.px+rx,z:c.pz+rz,hw:1.5,hd:1.6,on:function(){return lvl(h.id)>=2;}});
+      var tz=TRACK_Z-c.pz, k;
       /* Zug ohne Gesicht: Lok und ein Wagen */
       var tg=new T.Group();tg.position.set(3,0,tz);c.g3.add(tg);
       M(rbox(2.2,.18,.9,.06),mat('draw'),-.3,.3,0,tg);
@@ -148,7 +142,74 @@ KD.World=(function(){
   function pyramid(k,r,h){return geo(k,function(){var x=new T.ConeGeometry(r,h,4);x.rotateY(Math.PI/4);return x;});}
 
   /* Bauformen nach Funktion. c.g2 = Bau, c.g3 = Einrichtung, c.col(x,z,halbe Breite,halbe Tiefe,ab Stufe) = Hindernis */
+  var TRACK_Z=-17.3;
   var KIND3={
+    /* Gedächtnisturm: hoher Turm mit Reihen kleiner Fächer, die aufleuchten, wenn das Haus fertig ist */
+    tower:{windows:'none',chimney:false,flowers:false,build:function(c){
+      var k,r;
+      for(r=0;r<3;r++){for(k=-1;k<=1;k++){
+        M(panel(.5,.36,.06,.04),mat('glass'),k*.78,c.base+2.9+r*.62,c.d/2+.01,c.g2,true);
+        if((r+k+3)%2===0){M(panel(.5,.36,.06,.05),glow('lit'),k*.78,c.base+2.9+r*.62,c.d/2+.02,c.g3,true);}
+      }}
+      M(cyl(.04,.04,1.1,6),mat('draw'),0,c.top+c.rh+.4,0,c.g2);M(box(.5,.3,.03),mat('roof-2'),.27,c.top+c.rh+.75,0,c.g3,true);
+      /* Karteikasten neben dem Eingang */
+      var kx=-c.w/2-.9;M(rbox(.9,1.2,.7,.08),mat('wood'),kx,0,c.d/2-.2,c.g3);
+      for(k=0;k<3;k++){M(box(.7,.26,.04),mat('paper-svg'),kx,.22+k*.36,c.d/2+.16,c.g3,true);M(box(.16,.05,.05),mat('draw'),kx,.22+k*.36,c.d/2+.19,c.g3,true);}
+      c.col(kx,c.d/2-.2,.5,.4,3);
+    }},
+    /* Remise: Lokschuppen mit großem Tor, das Gleis führt hinein */
+    remise:{door:'none',windows:'none',chimney:false,flowers:false,embOnRoof:true,build:function(c){
+      M(archG(2.3,2.1,.12),mat('draw'),0,c.base,c.d/2-.05,c.g2);
+      M(box(.12,2.0,.1),mat('wood'),-1.24,c.base+1,c.d/2+.05,c.g2);M(box(.12,2.0,.1),mat('wood'),1.24,c.base+1,c.d/2+.05,c.g2);
+      /* Lok schaut aus dem Tor, wenn das Haus fertig ist */
+      var lg=new T.Group();lg.position.set(0,c.base,c.d/2-.15);c.g3.add(lg);
+      M(cyl(.5,.5,.5,18),mat('roof-4'),0,.75,0,lg).rotation.x=Math.PI/2;M(cyl(.52,.52,.06,18),mat('draw'),0,.75,.27,lg).rotation.x=Math.PI/2;
+      M(sph(.11,10,8),glow('lit'),0,.95,.32,lg,true);M(rbox(1.2,.2,.3,.05),mat('roof-2'),0,.12,.2,lg);
+      /* Signal und Ersatzräder */
+      var sx=c.w/2+.8;M(cyl(.06,.08,2.6,8),mat('draw'),sx,1.3,c.d/2+.6,c.g2);M(box(.7,.18,.05),mat('roof-2'),sx+.3,2.45,c.d/2+.6,c.g2).rotation.z=.5;M(sph(.1,8,6),glow('lit'),sx,2.1,c.d/2+.68,c.g3,true);
+      [[-.2,0],[.25,.06]].forEach(function(q){M(cyl(.34,.34,.1,16),mat('draw'),-c.w/2-.5+q[0],.36,c.d/2+.3+q[1],c.g3).rotation.set(Math.PI/2,0,.25);});
+    }},
+    /* Leuchtturm: rot-weißer Turm auf einem flachen Wärterhaus, das Licht geht an, wenn das Haus fertig ist */
+    lighthouse:{windows:'one',chimney:false,flowers:false,build:function(c){
+      var y=c.top+.16,k,r0=1.02;
+      for(k=0;k<5;k++){var ra=r0-k*.07,rb=r0-(k+1)*.07;M(cyl(rb,ra,.86,20),mat(k%2?'roof-2':'paper-svg'),0,y+.43+k*.86,0,c.g2);}
+      y+=5*.86;
+      M(cyl(.92,.92,.12,20),mat('draw'),0,y+.06,0,c.g2);
+      for(k=0;k<8;k++){var a=k*Math.PI/4;M(cyl(.025,.025,.4,5),mat('draw'),Math.cos(a)*.86,y+.3,Math.sin(a)*.86,c.g2,true);}
+      M(cyl(.5,.5,.7,14),mat('glass'),0,y+.47,0,c.g2);M(cyl(.44,.44,.6,14),glow('lit'),0,y+.47,0,c.g3,true);
+      M(geo('lhcap',function(){return new T.ConeGeometry(.66,.6,14);}),mat('roof-2'),0,y+1.12,0,c.g2);M(sph(.08,8,6),mat('draw'),0,y+1.46,0,c.g2,true);
+      /* Felsen am Ufer */
+      [[-2.2,.5,.5],[-2.7,-.6,.36],[-2.0,-1.3,.42]].forEach(function(q){M(sph(q[2],9,7),mat('stone-d'),q[0],q[2]*.5,q[1],c.g1).scale.set(1.3,.8,1);});
+    }},
+    /* Lagerhaus: Halle mit Schiebetor, Rampe und zwei gleichen Kistenstapeln (Original und Kopie) */
+    warehouse:{door:'none',windows:'none',chimney:false,flowers:false,build:function(c){
+      var k;
+      M(rbox(2.0,1.9,.12,.05),mat('wood'),0,c.base,c.d/2+.02,c.g2);M(box(2.9,.1,.1),mat('draw'),.4,c.base+1.98,c.d/2+.1,c.g2);
+      for(k=-3;k<=3;k++){M(box(.04,1.8,.03),mat('draw'),k*.28,c.base+.95,c.d/2+.09,c.g2,true);}
+      M(rbox(2.6,.26,1.0,.06),mat('stone-d'),0,0,c.d/2+.85,c.g1);
+      for(k=-1;k<=1;k+=2){M(panel(.7,.4,.06,.04),mat('glass'),k*1.9,c.base+2.0,c.d/2+.01,c.g2,true);M(panel(.7,.4,.06,.05),glow('lit'),k*1.9,c.base+2.0,c.d/2+.02,c.g3,true);}
+      [-1,1].forEach(function(sd){
+        var gx=sd*(c.w/2+1.0),g=new T.Group();g.position.set(gx,0,c.d/2+.1);c.g3.add(g);
+        M(rbox(1.0,.1,.9,.03),mat('wood'),0,0,0,g);M(rbox(.8,.6,.7,.06),mat('wall-5'),0,.1,0,g);M(rbox(.6,.5,.55,.06),mat('wall-1'),0,.7,0,g);
+        M(box(.82,.06,.03),mat('draw'),0,.42,.36,g,true);M(box(.62,.06,.03),mat('draw'),0,.96,.29,g,true);
+        c.col(gx,c.d/2+.1,.55,.5,3);
+      });
+    }},
+    /* Hafen: Hafenmeisterei mit Anker, Fässern und Wimpelmast. Steg und Wasser liegen gleich daneben. */
+    harbour:{flowers:false,chimney:false,build:function(c){
+      var g=new T.Group();g.position.set(0,c.base+2.3,c.d/2+.1);c.g2.add(g);
+      M(geo('anch1',function(){return new T.TorusGeometry(.3,.055,8,18,Math.PI);}),mat('draw'),0,-.28,0,g).rotation.z=Math.PI;
+      M(box(.08,.75,.06),mat('draw'),0,.02,0,g);M(box(.44,.07,.06),mat('draw'),0,.3,0,g);M(geo('anch2',function(){return new T.TorusGeometry(.1,.035,6,14);}),mat('draw'),0,.5,0,g);
+      [[-.3,0],[.3,.1],[0,-.45]].forEach(function(q){M(cyl(.26,.26,.7,12),mat('wood'),-c.w/2-.9+q[0],.35,c.d/2+q[1],c.g2);});
+      c.col(-c.w/2-.9,c.d/2-.1,.6,.55);
+      M(geo('buoy',function(){return new T.TorusGeometry(.26,.09,8,18);}),mat('roof-2'),1.35,c.base+1.3,c.d/2+.1,c.g3);
+      var mx=c.w/2+.9;M(cyl(.05,.07,3.4,8),mat('wood'),mx,1.7,c.d/2+.4,c.g3);
+      [['roof-2',3.1],['roof-5',2.75],['roof-1',2.4]].forEach(function(f){M(box(.5,.24,.03),mat(f[0]),mx+.28,f[1],c.d/2+.4,c.g3,true);});
+      /* Boot am Steg */
+      var b=new T.Group();b.position.set(HARBOUR.px-c.px+3.2,-.82,HARBOUR.pz-c.pz+1.5);c.g3.add(b);
+      M(rbox(2.4,.5,1.0,.2),mat('roof-1'),0,0,0,b);M(rbox(2.0,.12,.7,.08),mat('wood'),0,.42,0,b);M(cyl(.05,.05,2.2,8),mat('wood'),-.2,1.5,0,b);
+      M(geo('sail',function(){var s=new T.Shape();s.moveTo(0,0);s.lineTo(1.1,0);s.lineTo(0,1.7);s.lineTo(0,0);return new T.ExtrudeGeometry(s,{depth:.03,bevelEnabled:false});}),mat('paper-svg'),-.12,.75,0,b);
+    }},
     school:{build:function(c){
       var ty=c.top+.95;
       M(rbox(.9,1.05,.9,.08),mat(c.wall),0,ty,0,c.g2);
@@ -583,8 +644,8 @@ KD.World=(function(){
     var sc=active();if(player.parent!==sc){sc.add(player);}
     var nm=m==='room'?BYID[id].name:'';
     el.setAttribute('aria-label',m==='room'?'Im Haus: '+nm:'KI-Dorf in 3D');
-    chips(m==='room'?'Enter: lesen, lösen, hinausgehen':'Enter: betreten, ansprechen');
-    el.querySelector('#worldHelp').textContent=m==='room'?'Du bist im Haus '+nm+'. Mit den Pfeiltasten oder W, A, S, D läufst du. Am Lesepult öffnest du das Fundament, am Bautisch die Aufgaben, an der Kiste die Einrichtung, jeweils mit Enter. An der Tür gehst du hinaus. Mit der Tabulatortaste verlässt du den Raum und kommst zum Text.':'Klick ins Dorf oder geh mit der Tabulatortaste hinein. Mit den Pfeiltasten oder W, A, S, D läufst du. Vor einer Haustür trittst du mit Enter ein. Neben einer Figur sprichst du sie mit Enter an. Mit der Tabulatortaste verlässt du das Dorf. Die Karte darunter führt ebenfalls in jedes Haus.';
+    chips(m==='room'?'Enter: lesen, lösen, hinausgehen':'Enter: ansprechen, Baum schütteln');
+    el.querySelector('#worldHelp').textContent=m==='room'?'Du bist im Haus '+nm+'. Mit den Pfeiltasten oder W, A, S, D läufst du. Am Lesepult öffnest du das Fundament, am Bautisch die Aufgaben, an der Kiste die Einrichtung, jeweils mit Enter. Durch die Tür gehst du hinaus. Mit der Tabulatortaste verlässt du den Raum und kommst zum Text.':'Klick ins Dorf oder geh mit der Tabulatortaste hinein. Mit den Pfeiltasten oder W, A, S, D läufst du. Lauf durch eine Haustür, dann bist du im Haus. Enter vor der Tür geht auch. Neben einer Figur sprichst du sie mit Enter an, einen Baum schüttelst du mit Enter, dann fällt ein Tipp herunter. Mit der Tabulatortaste verlässt du das Dorf. Die Karte darunter führt ebenfalls in jedes Haus.';
   }
   /* Arbeiten mit dem Hammer: Figur bleibt stehen, schwingt, danach passiert fn */
   function startWork(dur,tx,tz,fn){
@@ -648,7 +709,8 @@ KD.World=(function(){
   function shake(i){
     var tr=trees[i];if(!tr||tr.t<.9){return;}
     tr.t=0;
-    var idx=0;
+    var all=KD.TIPS.map(function(t,i){return i;}),un=all.filter(function(i){return KD.S.data.tips.indexOf(i)<0;}),pool=un.length?un:all,idx=pool[Math.floor(Math.random()*pool.length)];
+    KD.S.seeTip(idx);
     var n=rm()?1:6;
     for(var k=0;k<n;k++){
       var m;
@@ -659,10 +721,10 @@ KD.World=(function(){
       m.userData.sc=m.scale.clone();
       falls.push({m:m,vy:-(.8+Math.random()*.5),ph:Math.random()*6,t:0,g:rm()?0:-1,sc:scene});
     }
-    var t={t:''};
+    var t=KD.TIPS[idx],th=BYID[t.haus],tm=tipEl.querySelector('.tipc-m');
     tipEl.querySelector('.tipc-t').textContent=t.t;
-    
-    tipEl.querySelector('.tipc-n').textContent='';
+    KD.clear(tm);if(th){tm.appendChild(KD.h('a',{href:'#haus/'+th.id},'Mehr dazu im Haus: '+th.name));}
+    tipEl.querySelector('.tipc-n').textContent='Tipp vom Baum · '+KD.S.data.tips.length+' von '+KD.TIPS.length+' gesammelt';
     tipEl.hidden=false;tipEl.userData={x:pl.x,z:pl.z};
     say('Tipp vom Baum: '+t.t);
   }
@@ -689,7 +751,7 @@ KD.World=(function(){
     M(new T.CylinderGeometry(33.4,31.5,1.4,64),mat('sign'),0,-1.4,0,null,true);
     ground=M(new T.CylinderGeometry(34,33.4,1,64),mat('grass'),0,-.5,0,null,true);pick.push(ground);
     /* Wege: drei Straßen, Verbindungen im Zickzack, Weg zum Start */
-    [[0,13.3,44,2.4],[0,-.7,44,2.4],[0,-14.7,44,2.4],[21,6.3,2.4,16.4],[-21,-7.7,2.4,16.4],[0,17.4,2.4,8.6],[0,-19.5,2.4,9]].forEach(function(s){M(rbox(s[2],.06,s[3],.7),mat('path'),s[0],.005,s[1],null,true);});
+    [[0,13.3,44,2.4],[0,-.7,44,2.4],[0,-14.7,44,2.4],[21,6.3,2.4,16.4],[-21,-7.7,2.4,16.4],[0,17.4,2.4,8.6],[25.5,-.7,8,2.4],[-25,-.7,8,2.4]].forEach(function(s){M(rbox(s[2],.06,s[3],.7),mat('path'),s[0],.005,s[1],null,true);});
     M(new T.CylinderGeometry(4.2,4.2,.07,40),mat('path'),0,.035,22.6,null,true);
     /* Brunnen am Start */
     M(cyl(1.4,1.55,.55,28),mat('stone'),0,.28,24);M(cyl(1.15,1.15,.06,28),mat('water'),0,.56,24,null,true);
@@ -700,7 +762,20 @@ KD.World=(function(){
     var lc=document.createElement('canvas');lc.width=512;lc.height=128;var tex=cvTex(lc);
     var s=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));s.scale.set(4,1,1);s.position.set(3.6,2.2,21.6);scene.add(s);
     welcome={lc:lc,tex:tex};colliders.push({x:3.6,z:21.6,r:.25});
-    [[-24,14],[-22,1],[-25,-9],[-17,-24],[-8,-28],[9,-28],[18,-22],[25,-10],[24,3],[23,16],[-14,26],[14,26],[0,4,.8],[-9,3.4,.7],[9,3.4,.7],[-6,-10.5,.85],[8,-10.5,.85],[-24,-18,.9],[24,-19,.9],[-26,8,.8],[27,10,.8]].forEach(function(t){tree(t[0],t[1],t[2]||1);});
+    [[-24,14],[-21,4],[-24,-11],[-13.5,-27],[-4,-27],[9,-28],[18,-23.5],[24,-11],[24,5],[23,16],[-14,26],[14,26],[0,4,.8],[-9,3.4,.7],[9,3.4,.7],[-4.5,-10.5,.85],[8,-10.5,.85],[-27,-13,.9],[24,-19,.9],[-26,8,.8],[27,10,.8]].forEach(function(t){tree(t[0],t[1],t[2]||1);});
+    /* Gleis: liegt von Anfang an. Hauptgleis vor Remise und Bahnhof, Stichgleis in die Remise, Prellbock am Ende. */
+    var tx0=-28.5,tx1=-2.6,kk;
+    M(box(tx1-tx0,.08,.08),mat('stone-d'),(tx0+tx1)/2,.06,TRACK_Z-.36,null,true);M(box(tx1-tx0,.08,.08),mat('stone-d'),(tx0+tx1)/2,.06,TRACK_Z+.36,null,true);
+    for(kk=tx0+.3;kk<tx1;kk+=.75){M(box(.22,.05,1.05),mat('wood'),kk,.03,TRACK_Z,null,true);}
+    M(box(.2,.7,1.1),mat('roof-2'),tx1+.1,.35,TRACK_Z);M(box(.5,.16,1.3),mat('wood'),tx1-.05,.62,TRACK_Z,null,true);
+    M(box(.08,.08,2.3),mat('stone-d'),-18.36,.06,TRACK_Z-1.25,null,true);M(box(.08,.08,2.3),mat('stone-d'),-17.64,.06,TRACK_Z-1.25,null,true);
+    for(kk=0;kk<3;kk++){M(box(1.05,.05,.22),mat('wood'),-18,.03,TRACK_Z-.7-kk*.7,null,true);}
+    /* Hafen: Steg ins Wasser mit Pfählen und Pollern, liegt von Anfang an */
+    var hx=HARBOUR.px,hz=HARBOUR.pz;
+    M(rbox(8.2,.14,1.5,.05),mat('wood'),hx+3.2,-.02,hz,null,true);
+    for(kk=0;kk<5;kk++){[-.68,.68].forEach(function(dz){M(cyl(.11,.13,1.5,8),mat('wood'),hx+kk*1.8,-.6,hz+dz,null,true);});}
+    [[5.6,-.5],[5.6,.5],[2.4,.5]].forEach(function(q){M(cyl(.12,.14,.4,8),mat('draw'),hx+q[0],.25,hz+q[1]);});
+    for(kk=0;kk<3;kk++){M(sph(.2,10,8),mat(kk%2?'paper-svg':'roof-2'),hx+4+kk*1.6,-.95,hz-2.2-kk*.5,null,true);}
     /* Blumen am Wegrand */
     for(var i=0;i<26;i++){var a=i*2.4,r=27+(i%3)*1.4;M(sph(.16,8,6),mat(['roof-2','roof-3','roof-5','paper-svg'][i%4]),Math.cos(a)*r,.16,Math.sin(a)*r,null,true);}
     /* Wolken am Horizont */
@@ -871,15 +946,16 @@ KD.World=(function(){
     var out=[];
     if(mode==='room'&&room){
       var RO=room;
-      out.push({key:'x',x:0,z:3.4,r:1.3,label:'Hinaus ins Dorf',say:'Du stehst an der Tür. Mit Enter gehst du hinaus ins Dorf.',fn:function(){location.hash='#dorf';}});
+      out.push({key:'x',x:0,z:3.4,r:1.3,auto:.55,label:'Hinaus ins Dorf',say:'Du stehst an der Tür. Mit Enter gehst du hinaus ins Dorf.',fn:function(){location.hash='#dorf';}});
       RO.stations.forEach(function(s,i){out.push({key:'s'+i,x:s.gx,z:s.gz,r:1.2,label:STN[i].act,say:STN[i].say+' Mit Enter öffnest du es.',fn:function(){KD.app.openStep(['f','t','e'][i]);}});});
       return out;
     }
     Object.keys(HS).forEach(function(id){
       var H=HS[id],nm=H.h.name;
-      out.push({key:'h:'+id,hid:id,x:H.door.x,z:H.door.z,r:1.6,label:'Eintreten: '+nm,say:'Du stehst vor: '+nm+'. '+H.h.sub+'. Mit Enter trittst du ein.',fn:function(){go(id);}});
+      out.push({key:'h:'+id,hid:id,x:H.door.x,z:H.door.z-.35,r:1.9,auto:.6,label:'Eintreten: '+nm,say:'Du stehst vor: '+nm+'. '+H.h.sub+'. Geh durch die Tür oder drück Enter.',fn:function(){go(id);}});
     });
     out.push({key:'platz',x:3.6,z:21.6,r:1.7,label:'Dorfplatz ansehen',say:'Du stehst am Schwarzen Brett. Mit Enter öffnest du den Dorfplatz.',fn:function(){KD.app.go('dorfplatz');}});
+    trees.forEach(function(t,i){out.push({key:'t:'+i,tree:i,x:t.x,z:t.z,r:.55*t.s+.1+.95,label:'Baum schütteln',say:'Du stehst bei einem Baum. Mit Enter schüttelst du ihn, dann fällt ein Tipp herunter.',fn:function(){shake(i);}});});
     npcs.forEach(function(n){out.push({key:'n:'+n.d.id,x:n.d.pos[0],z:n.d.pos[1],r:1.7,label:'Ansprechen: '+n.d.name,say:n.d.name+', '+n.d.beruf+'. Mit Enter bekommst du einen Tipp.',fn:function(){keys={};KD.app.npc(n.d.id);}});});
     return out;
   }
@@ -905,8 +981,10 @@ KD.World=(function(){
     /* Tippkarte verschwindet, wenn die Figur weitergeht. In der Sammlung bleibt der Tipp. */
     if(mode==='village'&&!tipEl.hidden&&tipEl.userData&&Math.hypot(pl.x-tipEl.userData.x,pl.z-tipEl.userData.z)>3.5){tipEl.hidden=true;}
     if(busy){return;}
-    var best=null,bd=1e9;
-    candidates().forEach(function(c){var dd=Math.hypot(pl.x-c.x,pl.z-c.z);if(dd<c.r&&dd<bd){bd=dd;best=c;}});
+    var best=null,bd=1e9,inAuto=null;
+    candidates().forEach(function(c){var dd=Math.hypot(pl.x-c.x,pl.z-c.z);if(dd<c.r&&dd<bd){bd=dd;best=c;}if(c.auto&&dd<c.auto+(armed?0:.7)){inAuto=c;}});
+    if(!inAuto){armed=true;}
+    else if(armed&&pl.walk>.2){armed=false;keys={};joy.x=joy.z=0;target=null;inAuto.fn();return;}
     var key=best?best.key:'';
     if(key===nearKey){return;}
     nearKey=key;cur=best;near=best&&best.hid?best.hid:null;nearTree=best&&best.tree!==undefined?best.tree:-1;
@@ -928,7 +1006,7 @@ KD.World=(function(){
       while(o&&o!==gnd&&!(o.userData&&(o.userData.hid||o.userData.go||o.userData.tree!==undefined))){o=o.parent;}
       if(!o){continue;}
       if(o.userData.go){target={x:o.userData.go.x,z:o.userData.go.z};return;}
-      if(o===gnd){target={x:hits[i].point.x,z:hits[i].point.z};return;}
+      if(o===gnd){target={x:hits[i].point.x,z:hits[i].point.z};if(mode==='room'&&Math.hypot(target.x-1.85,target.z-3.5)<1.3){target={x:0,z:3.45};}return;}
       if(o.userData.hid){var H=HS[o.userData.hid];target={x:H.door.x,z:H.door.z};return;}
       if(o&&o.userData&&o.userData.tree!==undefined){
         var tr=trees[o.userData.tree],vx=pl.x-tr.x,vz=pl.z-tr.z,vl=Math.hypot(vx,vz)||1,rr2=.55*tr.s+.1+R+.3;
@@ -1033,7 +1111,8 @@ KD.World=(function(){
       if(!this.init()||!slot||!slot.parentNode){this.detach();return false;}
       var hadFocus=document.activeElement===el;
       if(hid){pl.x=0;pl.z=1.5;pl.face=Math.PI;target=null;snapCam=true;}
-      else if(lastHid&&HS[lastHid]){var H=HS[lastHid];pl.x=H.door.x;pl.z=H.door.z+.3;pl.face=0;target=null;snapCam=true;}
+      else if(lastHid&&HS[lastHid]){var H=HS[lastHid];pl.x=H.door.x;pl.z=H.door.z+.9;pl.face=0;target=null;snapCam=true;}
+      armed=false;
       lastHid=hid||null;
       slot.parentNode.replaceChild(el,slot);
       reconcile();

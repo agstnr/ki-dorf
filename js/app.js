@@ -14,13 +14,12 @@ function bar(p, label) { return h('div', {class: 'bar', role: 'progressbar', 'ar
 var LV = ['Bauplatz', 'Fundament', 'Gebaut', 'Eingerichtet'];
 
 /* ---------- Bauplätze im Dorf (Seminarreihenfolge, drei Straßen im Zickzack) ---------- */
+/* Jedes Haus steht dort, wo es zum Thema passt: Leuchtturm und Hafen am Wasser, Remise und Bahnhof am Gleis. */
 (function () {
-  var row = [-18, -9, 0, 9, 18], spots = [], i;
-  for (i = 0; i < 5; i++) { spots.push({x: row[i], z: 10}); }
-  for (i = 4; i >= 0; i--) { spots.push({x: row[i], z: -4}); }
-  for (i = 0; i < 5; i++) { spots.push({x: row[i], z: -18}); }
-  spots.push({x: 0, z: -26.5});
-  var n = 0; KD.HOUSES.forEach(function (x) { if (x.look) { x.spot = spots[n++]; } });
+  var P = {fundamenthaus: [-18, 10], tresorhaus: [-9, 10], projekthaus: [0, 10], werkstatt: [9, 10], detektivbuero: [18, 10],
+    schreibstube: [18, -4], archiv: [9, -4], gedaechtnisturm: [0, -4], lagerhaus: [-9, -4], leuchtturm: [-29, -4.5],
+    remise: [-18, -21], bahnhof: [-9, -21], post: [0, -18], atelier: [9, -18], labor: [18, -18], hafen: [28.5, -4.5]};
+  KD.HOUSES.forEach(function (x) { if (x.look && P[x.id]) { x.spot = {x: P[x.id][0], z: P[x.id][1]}; } });
 })();
 
 /* ---------- Einstellungen ---------- */
@@ -117,9 +116,11 @@ function openNpc(id, from) {
 /* ---------- Karte ---------- */
 var posDot = null;
 function mapSvg(curId) {
-  var s = KD.svg, kids = [s('circle', {cx: 0, cy: 0, r: 33, class: 'm-insel'})];
-  [[0, 13.3, 44, 2.4], [0, -0.7, 44, 2.4], [0, -14.7, 44, 2.4], [0, 18, 2.4, 9]].forEach(function (r) { kids.push(s('rect', {x: r[0] - r[2] / 2, y: r[1] - r[3] / 2, width: r[2], height: r[3], rx: 1, class: 'm-weg'})); });
+  var s = KD.svg, kids = [s('rect', {x: -40, y: -35, width: 80, height: 72, class: 'm-wasser'}), s('circle', {cx: 0, cy: 0, r: 33, class: 'm-insel'})];
+  [[0, 13.3, 44, 2.4], [0, -0.7, 58, 2.4], [0, -14.7, 44, 2.4], [0, 18, 2.4, 9]].forEach(function (r) { kids.push(s('rect', {x: r[0] - r[2] / 2, y: r[1] - r[3] / 2, width: r[2], height: r[3], rx: 1, class: 'm-weg'})); });
   kids.push(s('circle', {cx: 0, cy: 23, r: 4.4, class: 'm-weg'}));
+  kids.push(s('path', {d: 'M-28.5 -17.3H-2.6M-18 -17.3V-19.2', class: 'm-gleis'}));
+  kids.push(s('rect', {x: 31.6, y: -5.2, width: 6.6, height: 1.4, class: 'm-steg'}));
   var next = S.nextHouse();
   KD.HOUSES.forEach(function (x, n) {
     var p = x.spot || {x: 0, z: 23}, lv = S.level(x), cls = 'm-haus lv' + lv + (x.extra ? ' extra' : '') + (curId === x.id ? ' cur' : '') + (next && next.id === x.id ? ' next' : '');
@@ -130,7 +131,7 @@ function mapSvg(curId) {
     kids.push(a);
   });
   posDot = s('circle', {cx: 0, cy: 19.8, r: 1.3, class: 'm-ich'}); posDot.setAttribute('visibility', 'hidden'); kids.push(posDot);
-  return s('svg', {viewBox: '-36 -33 72 68', class: 'map', role: 'group', 'aria-label': 'Karte des Dorfs. Jedes Haus ist ein Link.'}, kids);
+  return s('svg', {viewBox: '-39 -34 78 70', class: 'map', role: 'group', 'aria-label': 'Karte des Dorfs. Jedes Haus ist ein Link.'}, kids);
 }
 function legend() { return h('ul', {class: 'legend'}, [['lv0', 'Bauplatz'], ['lv1', 'Fundament'], ['lv2', 'Gebaut'], ['lv3', 'Eingerichtet'], ['next', 'Empfohlen']].map(function (l) { return h('li', null, h('span', {class: 'lg ' + l[0], 'aria-hidden': 'true'}), l[1]); })); }
 
@@ -170,8 +171,10 @@ function viewHaus(x) {
   var npc = KD.NPCS.filter(function (n) { return n.id === x.npc; })[0];
   var stage = h('section', {class: 'stage', id: 'stage', 'aria-labelledby': 'stage-h'}), tabs = h('div', {class: 'steps', role: 'group', 'aria-label': 'Schritte im Haus'});
   var pbar = bar(S.pct(x), 'Fortschritt in diesem Haus'), plabel = h('span', {class: 'small'}), art = h('div', {class: 'hausart'});
-  var world = use3d() && x.look && window.innerWidth > 900 ? h('div', {id: 'worldSlot'}) : null;
-  houseRefs = {x: x, refresh: refresh, show: show};
+  var world = use3d() && x.look ? h('div', {id: 'worldSlot'}) : null;
+  var fsTog = btn('fs-toggle', 'Karten ausblenden', function () { var min = main.classList.toggle('fs-min'); fsTog.textContent = min ? 'Karten zeigen' : 'Karten ausblenden'; fsTog.setAttribute('aria-expanded', String(!min)); }, {'aria-expanded': 'true'});
+  var main = h('div', {class: 'hausmain'}, fsTog, tabs, stage);
+  houseRefs = {x: x, refresh: refresh, show: show, open: function () { main.classList.remove('fs-min'); fsTog.textContent = 'Karten ausblenden'; fsTog.setAttribute('aria-expanded', 'true'); }};
   function refresh() {
     var lv = S.level(x), p = S.pct(x);
     setW(pbar.firstChild, p); pbar.setAttribute('aria-valuenow', Math.round(p * 100));
@@ -194,7 +197,7 @@ function viewHaus(x) {
         x.tasks.length ? h('div', {class: 'progress slim'}, pbar, plabel) : null,
         npc ? btn('npcbtn inline', [npcFace(npc), h('span', null, 'Tipp von ' + npc.name)], function (e) { openNpc(npc.id, e.currentTarget); }) : null)),
       world ? h('aside', {class: 'roomwrap', 'aria-label': 'Blick ins Haus'}, world) : null,
-      h('div', {class: 'hausmain'}, tabs, stage))]);
+      main)]);
   show(cur, false);
   if (world) { KD.World.attach(world, x.id); } else if (KD.World) { KD.World.detach(); }
 }
@@ -385,6 +388,18 @@ function viewFort() {
   if (KD.World) { KD.World.detach(); }
 }
 
+/* ---------- Impressum, Hinweise, Lizenzen ---------- */
+function viewImp() {
+  var I = KD.IMPRESSUM;
+  KD.clear(app);
+  KD.add(app, [h('h1', {id: 'top', tabindex: '-1'}, 'Impressum und Lizenzen'),
+    h('section', {class: 'panel'}, h('h2', null, 'Impressum'), h('p', null, 'Für den Inhalt verantwortlich: ' + I.name), I.zeilen.map(function (z) { return h('p', null, z); }), h('p', null, I.zweck)),
+    h('section', {class: 'panel'}, h('h2', null, 'Hinweise'), h('ul', null, I.hinweise.map(function (z) { return h('li', null, z); }))),
+    h('section', {class: 'panel'}, h('h2', null, 'Datenschutz'), h('ul', null, I.daten.map(function (z) { return h('li', null, z); }))),
+    h('section', {class: 'panel'}, h('h2', null, 'Lizenzen'), h('ul', null, I.lizenzen.map(function (z) { return h('li', null, z); })), h('p', null, link('#bibliothek', 'Alle Quellen stehen in der Bibliothek', 'more')))]);
+  if (KD.World) { KD.World.detach(); }
+}
+
 /* ---------- Meldung ---------- */
 var toastEl = document.getElementById('toast'), toastT = 0;
 function toast(t) { toastEl.textContent = t; toastEl.hidden = false; clearTimeout(toastT); toastT = setTimeout(function () { toastEl.hidden = true; }, 3500); }
@@ -397,9 +412,10 @@ function route() {
   else if (p[0] === 'bibliothek') { tab = 'bibliothek'; viewBib(); }
   else if (p[0] === 'fortschritt') { tab = 'fortschritt'; viewFort(); }
   else if (p[0] === 'runde') { viewRunde(); }
+  else if (p[0] === 'impressum') { tab = ''; viewImp(); }
   else { viewDorf(); }
   Array.prototype.forEach.call(navEls, function (a) { if (a.getAttribute('data-tab') === tab) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); } });
-  document.title = (p[0] === 'haus' && KD.BYID[p[1]] ? KD.BYID[p[1]].name + ' · ' : tab === 'bibliothek' ? 'Bibliothek · ' : tab === 'fortschritt' ? 'Fortschritt · ' : '') + 'KI-Dorf';
+  document.title = (p[0] === 'haus' && KD.BYID[p[1]] ? KD.BYID[p[1]].name + ' · ' : tab === 'bibliothek' ? 'Bibliothek · ' : tab === 'fortschritt' ? 'Fortschritt · ' : p[0] === 'impressum' ? 'Impressum · ' : '') + 'KI-Dorf';
   if (lastRoute !== null && lastRoute !== r) { window.scrollTo(0, 0); var top = document.getElementById('top'); if (top && !(KD.World && KD.World.wantsFocus())) { top.focus({preventScroll: true}); } }
   lastRoute = r;
 }
@@ -420,7 +436,7 @@ KD.app = {
   go: function (id) { location.hash = '#haus/' + id; },
   npc: function (id) { openNpc(id, null); },
   pos: function (x, z, on) { if (posDot && posDot.isConnected) { posDot.setAttribute('cx', x.toFixed(1)); posDot.setAttribute('cy', z.toFixed(1)); posDot.setAttribute('visibility', on ? 'visible' : 'hidden'); } },
-  openStep: function (k) { if (houseRefs.show) { houseRefs.show(k, true); } },
+  openStep: function (k) { if (houseRefs.show) { houseRefs.open(); houseRefs.show(k, true); } },
   help: openHelp
 };
 
