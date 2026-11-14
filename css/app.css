@@ -50,7 +50,6 @@ p{margin:0} ul,ol{margin:0;padding-left:1.3em} a{color:var(--accent)}
 .eyebrow{font:800 .74em/1.2 var(--body);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
 .tag{font-weight:800;font-size:.74em;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft)}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.note{background:var(--warn-bg);color:var(--ink);padding:12px 14px;border-radius:var(--r);border-left:5px solid var(--warn);max-width:70ch}
 .warnbox{background:var(--bad-bg);padding:12px 14px;border-radius:var(--r);border-left:5px solid var(--bad);margin-bottom:10px}
 .okline{color:var(--ok);font-weight:800}
 

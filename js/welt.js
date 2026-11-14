@@ -401,7 +401,7 @@ KD.World=(function(){
      Ist ein Abschnitt gelöst, baut man mit dem Hammer: Fundament legen, Wände hochziehen.
      Nach der Einrichtung packt man Kartons aus, jeder Karton stellt ein Möbelstück auf, passend zum Haustyp. */
   var BOOKC=['roof-2','roof-1','roof-3','roof-5','roof-4'];
-  var FLOOR={vault:'stone',archive:'stone',lab:'paper-svg',station:'stone'};
+  var FLOOR={vault:'stone',archive:'stone',lab:'paper-svg',station:'stone',tower:'stone',remise:'stone',warehouse:'stone',code:'paper-svg'};
   var STN=[
     {stage:'Fundament',act:'Fundament lesen',x:-4.6,z:-2.7,hw:.45,hd:.4,say:'Am Lesepult liest du das Fundament.'},
     {stage:'Aufgaben',act:'Aufgaben lösen',x:4.6,z:-2.7,hw:.8,hd:.5,say:'Am Bautisch löst du die Aufgaben.'},
@@ -510,7 +510,80 @@ KD.World=(function(){
       {n:'Feedbackkasten',x:-4.2,z:2.6,hw:.35,hd:.3,b:function(g){M(cyl(.05,.05,.8,8),mat('draw'),0,.4,0,g);M(rbox(.6,.55,.45,.1),mat('roof-2'),0,.8,0,g);M(box(.3,.04,.02),mat('draw'),0,1.2,.23,g,true);plate('Feedback',.55,.17,'paper-svg','roof-2',g,0,.98,.235);}}
     ]
   };
-  function furnList(id){return FURN[(BYID[id].look||{}).kind]||FURN.school;}
+
+  /* Einrichtung für die Häuser, die nach ihrem Thema gebaut sind. Jedes Möbelstück gehört zum Inhalt des Hauses. */
+  FURN.tower=[
+    {n:'Erinnerungsfächer',x:0,z:-3.7,hw:1.75,hd:.3,b:function(g){M(rbox(3.4,2.4,.5,.05),mat('wood'),0,0,0,g);
+      for(var i=0;i<6;i++){for(var j=0;j<5;j++){var x=-1.4+i*.56,y=.3+j*.44;M(box(.5,.38,.03),mat((i+j)%3===0?'wall-1':'wall-5'),x,y,.26,g,true);M(box(.22,.05,.02),mat('draw'),x,y+.07,.285,g,true);M(sph(.03,6,5),(i*j)%4===1?glow('lit'):mat('stone-d'),x+.16,y-.08,.285,g,true);}}}},
+    {n:'Standuhr',x:-5.25,z:.4,r:Math.PI/2,hw:.4,hd:.3,b:function(g){M(rbox(.6,2.2,.4,.05),mat('wood'),0,0,0,g);M(cyl(.26,.26,.05,22),mat('paper-svg'),0,1.75,.21,g,true).rotation.x=Math.PI/2;M(box(.04,.2,.02),mat('draw'),0,1.81,.25,g,true);M(box(.14,.035,.02),mat('draw'),.05,1.75,.25,g,true);M(panel(.34,.8,.04,.03),mat('glass'),0,.85,.21,g,true);
+      var p=new T.Group();p.position.set(0,1.25,.23);g.add(p);M(box(.02,.6,.02),mat('lit'),0,-.3,0,p,true);M(sph(.09,10,8),mat('lit'),0,-.62,0,p,true);rAnim(function(dt,t){p.rotation.z=Math.sin(t*2)*.25;});}},
+    {n:'Notiztisch',x:-2,z:.6,hw:.85,hd:.85,b:function(g){table(g,1.6,.9,.78);chair(g,0,.7,Math.PI);M(box(.5,.03,.36),mat('roof-3'),-.1,.8,0,g,true);M(box(.22,.012,.32),mat('paper-svg'),-.22,.826,0,g,true);M(box(.22,.012,.32),mat('paper-svg'),.02,.826,0,g,true);
+      [['lit',.4,.15],['roof-2',.52,-.05],['roof-4',.38,-.22]].forEach(function(s){M(box(.16,.012,.16),mat(s[0]),s[1],.8,s[2],g,true);});dlamp(g,-.6,.78,-.25);}},
+    {n:'Schalterpult',x:2,z:.6,hw:.55,hd:.4,b:function(g){M(rbox(.9,.9,.6,.06),mat('stone-d'),0,0,0,g);M(rbox(1.0,.08,.7,.03),mat('stone'),0,.9,0,g);M(cyl(.13,.13,.07,16),mat('lit'),-.22,1.02,.05,g);M(cyl(.13,.13,.07,16),mat('roof-2'),.22,1.02,.05,g);plate('Pause',.36,.16,'lit','draw',g,-.22,.55,.31);plate('Reset',.36,.16,'roof-2','paper-svg',g,.22,.55,.31);}},
+    {n:'Sanduhr',x:-4.2,z:2.6,hw:.4,hd:.4,b:function(g){M(cyl(.38,.4,.06,16),mat('wood'),0,.03,0,g);M(cyl(.38,.4,.06,16),mat('wood'),0,1.57,0,g);
+      [0,1,2].forEach(function(k){var a=k*Math.PI*2/3;M(cyl(.025,.025,1.5,6),mat('wood'),Math.cos(a)*.3,.8,Math.sin(a)*.3,g);});
+      var cg=geo('hgcone',function(){return new T.ConeGeometry(.3,.7,14);});M(cg,mat('glass'),0,1.2,0,g,true).rotation.x=Math.PI;M(cg,mat('glass'),0,.42,0,g,true);M(cg,mat('lit'),0,.3,0,g,true).scale.set(.6,.5,.6);}}
+  ];
+  FURN.remise=[
+    {n:'Skill-Regal',x:0,z:-3.7,hw:1.75,hd:.3,b:function(g){shelf(g,3.4,2.2,.5,false);
+      for(var s=0;s<4;s++){for(var i=0;i<5;i++){var x=-1.28+i*.64,y0=.06+s*.52+.025;M(rbox(.5,.34,.38,.04),mat(BOOKC[(i+s)%5]),x,y0,.02,g,true);M(box(.26,.08,.01),mat('paper-svg'),x,y0+.2,.215,g,true);}}
+      plate('Skills',.9,.26,'sign','sign-ink',g,0,2.35,.1);}},
+    {n:'Bauplan-Werkbank',x:-5.25,z:.4,r:Math.PI/2,hw:.85,hd:.4,b:function(g){table(g,1.5,.7,.9);M(box(1.1,.01,.5),mat('roof-1'),0,.905,0,g,true);[[-.3,.1,.5],[.1,-.1,.4]].forEach(function(l){M(box(l[2],.012,.02),mat('paper-svg'),l[0],.915,l[1],g,true);});M(cyl(.07,.07,.9,10),mat('paper-svg'),.2,.98,.2,g,true).rotation.z=Math.PI/2;M(cyl(.12,.12,.05,12),mat('stone-d'),-.5,.93,-.1,g,true);}},
+    {n:'Lok im Wartungsstand',x:-2,z:.6,hw:1.1,hd:.55,b:function(g){M(box(2.4,.06,.06),mat('stone-d'),0,.05,-.32,g,true);M(box(2.4,.06,.06),mat('stone-d'),0,.05,.32,g,true);for(var k=-5;k<=5;k++){M(box(.14,.04,.9),mat('wood'),k*.22,.02,0,g,true);}
+      var l=new T.Group();l.position.set(0,.1,0);g.add(l);M(rbox(1.4,.18,.6,.05),mat('draw'),0,.1,0,l);M(cyl(.26,.26,.9,16),mat('roof-4'),-.2,.58,0,l).rotation.z=Math.PI/2;M(cyl(.07,.1,.35,8),mat('draw'),-.45,1.0,0,l);M(rbox(.5,.7,.58,.06),mat('roof-4d'),.45,.28,0,l);M(rbox(.6,.06,.66,.03),mat('draw'),.45,.98,0,l,true);M(panel(.25,.22,.05,.02),glow('lit'),.45,.62,.3,l,true);
+      [-.5,0,.5].forEach(function(x){[-.31,.31].forEach(function(z){M(cyl(.14,.14,.05,12),mat('draw'),x,.14,z,l,true).rotation.x=Math.PI/2;});});}},
+    {n:'Plug-in-Kiste',x:2,z:.6,hw:.7,hd:.5,b:function(g){M(rbox(1.3,.55,.9,.06),mat('wood'),0,0,0,g);M(box(1.34,.06,.94),mat('roof-5'),0,.56,0,g,true);M(rbox(.34,.5,.05,.03),mat('paper-svg'),-.35,.59,.05,g);M(box(.2,.05,.01),mat('roof-3'),-.35,.95,.09,g,true);M(cyl(.07,.07,.3,10),mat('draw'),0,.74,0,g);M(box(.12,.1,.05),mat('lit'),0,.94,0,g,true);M(rbox(.3,.24,.3,.05),mat('roof-1'),.4,.59,0,g);plate('Plug-in',.8,.22,'paper-svg','roof-5',g,0,.28,.46);}},
+    {n:'Steckerwand',x:-4.2,z:2.6,hw:.65,hd:.3,b:function(g){M(rbox(1.2,1.4,.12,.04),mat('stone-d'),0,0,0,g);
+      [[-.3,1.05],[.3,1.05],[0,.55]].forEach(function(p,k){M(cyl(.14,.14,.05,14),mat('draw'),p[0],p[1],.08,g,true).rotation.x=Math.PI/2;M(sph(.025,6,5),glow(k%2?'roof-4':'lit'),p[0],p[1]+.2,.1,g,true);});
+      M(rbox(.2,.14,.12,.03),mat('roof-2'),0,.48,.14,g);M(cyl(.025,.025,.5,6),mat('draw'),0,.22,.17,g,true);}}
+  ];
+  FURN.lighthouse=[
+    {n:'Seekarte',x:0,z:-3.96,hw:0,hd:0,b:function(g){M(rbox(3.0,1.5,.06,.04),mat('wood'),0,.85,0,g);M(box(2.8,1.3,.03),mat('lit'),0,1.6,.04,g,true);
+      var pts=[[-1.1,1.25],[-.4,1.85],[.3,1.4],[1.0,2.0]];
+      for(var k=0;k<pts.length-1;k++){for(var d=0;d<=5;d++){M(sph(.03,6,5),mat('roof-2'),pts[k][0]+(pts[k+1][0]-pts[k][0])*d/5,pts[k][1]+(pts[k+1][1]-pts[k][1])*d/5,.06,g,true);}}
+      M(sph(.07,8,6),mat('draw'),pts[0][0],pts[0][1],.07,g,true);M(box(.22,.04,.02),mat('roof-2'),1.0,2.0,.06,g,true).rotation.z=Math.PI/4;M(box(.22,.04,.02),mat('roof-2'),1.0,2.0,.06,g,true).rotation.z=-Math.PI/4;}},
+    {n:'Fernrohr',x:-5.25,z:.4,r:Math.PI/2,hw:.45,hd:.45,b:function(g){[0,1,2].forEach(function(k){var a=k*Math.PI*2/3,l=M(cyl(.025,.03,1.3,6),mat('wood'),Math.cos(a)*.22,.62,Math.sin(a)*.22,g,true);l.rotation.set(-Math.sin(a)*.34,0,Math.cos(a)*.34);});
+      var t=new T.Group();t.position.set(0,1.28,0);t.rotation.set(0,.5,-.35);g.add(t);M(cyl(.07,.09,.9,12),mat('roof-5'),0,0,0,t).rotation.z=Math.PI/2;M(cyl(.1,.1,.2,12),mat('draw'),.5,0,0,t).rotation.z=Math.PI/2;M(cyl(.06,.06,.1,12),mat('draw'),-.5,0,0,t).rotation.z=Math.PI/2;}},
+    {n:'Kartentisch',x:-2,z:.6,hw:.85,hd:.5,b:function(g){table(g,1.6,.9,.82);M(box(1.1,.012,.7),mat('lit'),0,.826,0,g,true);for(var i=0;i<5;i++){M(sph(.035,6,5),mat('roof-2'),-.4+i*.2,.84,.1-Math.sin(i*1.1)*.18,g,true);}M(cyl(.12,.12,.04,16),mat('wood'),.55,.84,.18,g,true);M(cyl(.1,.1,.02,16),mat('paper-svg'),.55,.865,.18,g,true);M(box(.015,.01,.16),mat('roof-2'),.55,.88,.18,g,true).rotation.y=.6;}},
+    {n:'Steuerrad',x:2,z:.6,hw:.55,hd:.4,b:function(g){M(rbox(.5,.9,.4,.05),mat('wood'),0,0,0,g);M(cyl(.05,.05,.5,8),mat('wood'),0,1.15,.24,g,true).rotation.x=Math.PI/2;
+      var w=new T.Group();w.position.set(0,1.4,.34);g.add(w);M(geo('wheelring',function(){return new T.TorusGeometry(.42,.045,8,26);}),mat('wood'),0,0,0,w);for(var k=0;k<8;k++){var a=k*Math.PI/4;M(cyl(.025,.025,.95,5),mat('wood'),0,0,0,w,true).rotation.z=a;M(sph(.06,6,5),mat('lit'),Math.cos(a)*.46,Math.sin(a)*.46,0,w,true);}M(cyl(.09,.09,.1,12),mat('lit'),0,0,0,w,true).rotation.x=Math.PI/2;rAnim(function(dt,t){w.rotation.z=Math.sin(t*.8)*.5;});}},
+    {n:'Rettungsring',x:-4.2,z:2.6,hw:.45,hd:.3,b:function(g){M(cyl(.05,.06,1.9,8),mat('draw'),0,.95,0,g,true);var r=new T.Group();r.position.set(0,1.15,.1);g.add(r);M(geo('lring',function(){return new T.TorusGeometry(.34,.1,8,24);}),mat('roof-2'),0,0,0,r);for(var k=0;k<4;k++){var a=k*Math.PI/2+Math.PI/4;M(box(.12,.2,.12),mat('paper-svg'),Math.cos(a)*.34,Math.sin(a)*.34,0,r,true).rotation.z=a;}plate('Erst prüfen',.9,.26,'roof-2','paper-svg',g,0,1.85,.07);}}
+  ];
+  FURN.warehouse=[
+    {n:'Palettenregal',x:0,z:-3.7,hw:1.75,hd:.3,b:function(g){[-1.65,1.65].forEach(function(x){M(box(.08,2.4,.5),mat('roof-2'),x,1.2,0,g);});
+      [.15,1.0,1.85].forEach(function(y,s){M(box(3.3,.07,.5),mat('roof-5'),0,y,0,g,true);for(var i=0;i<4;i++){if((i+s)%4===3){continue;}var x=-1.2+i*.8;M(rbox(.62,.5,.4,.04),mat((i+s)%2?'wood':'wall-5'),x,y+.035,0,g,true);M(box(.28,.1,.01),mat('paper-svg'),x,y+.3,.205,g,true);}});}},
+    {n:'Hubwagen',x:-5.2,z:.4,r:Math.PI/2,hw:.75,hd:.4,b:function(g){M(rbox(1.2,.08,.6,.03),mat('roof-2'),0,.12,0,g);M(box(.06,.9,.06),mat('draw'),-.6,.6,.2,g);M(box(.06,.9,.06),mat('draw'),-.6,.6,-.2,g);M(box(.06,.06,.5),mat('draw'),-.6,1.05,0,g,true);
+      [[-.5,-.3],[-.5,.3],[.5,-.3],[.5,.3]].forEach(function(p){M(cyl(.09,.09,.06,10),mat('draw'),p[0],.09,p[1],g,true).rotation.x=Math.PI/2;});M(rbox(.5,.4,.4,.04),mat('wood'),.15,.2,0,g);}},
+    {n:'Original (gesichert)',x:-2,z:.6,hw:.6,hd:.45,b:function(g){M(rbox(1.0,.6,.7,.05),mat('stone-d'),0,0,0,g);M(rbox(.8,.5,.6,.05),mat('stone'),0,.6,0,g);plate('Original',.7,.2,'roof-2','paper-svg',g,0,.3,.36);M(rbox(.16,.14,.06,.03),mat('lit'),0,.78,.31,g);M(geo('padl',function(){return new T.TorusGeometry(.06,.02,6,12,Math.PI);}),mat('draw'),0,.94,.31,g,true);}},
+    {n:'Arbeitstisch mit Kopie',x:2,z:.6,hw:.8,hd:.85,b:function(g){table(g,1.5,.9,.78);chair(g,0,.7,Math.PI);M(rbox(.6,.22,.4,.03),mat('wood'),-.2,.78,0,g);plate('Kopie',.5,.16,'roof-4','paper-svg',g,-.2,.88,.215);
+      [0,1,2].forEach(function(k){M(box(.3,.22,.02),mat(BOOKC[k]),-.34+k*.14,1.05,0,g,true).rotation.y=.2*(k-1);});M(box(.3,.02,.4),mat('paper-svg'),.45,.8,0,g,true);M(box(.22,.02,.3),mat('roof-5'),.45,.82,0,g,true);}},
+    {n:'Ordnerwagen',x:-4.2,z:2.6,hw:.5,hd:.35,b:function(g){M(rbox(.9,.9,.6,.06),mat('roof-1'),0,.12,0,g);[[-.32,-.2],[.32,-.2],[-.32,.2],[.32,.2]].forEach(function(p){M(sph(.07,8,6),mat('draw'),p[0],.07,p[1],g,true);});for(var i=0;i<6;i++){M(box(.1,.4,.34),mat(BOOKC[i%5]),-.32+i*.128,1.22,0,g,true);}}}
+  ];
+  FURN.harbour=[
+    {n:'Schiffsmodelle',x:0,z:-3.7,hw:1.75,hd:.3,b:function(g){shelf(g,3.4,2.2,.45,false);for(var s=0;s<4;s++){var y0=.06+s*.52+.025;for(var i=0;i<4;i++){if((i*3+s)%5===4){continue;}var x=-1.2+i*.8;M(rbox(.5,.12,.2,.05),mat(BOOKC[(i+s)%5]),x,y0,0,g,true);M(cyl(.012,.012,.36,5),mat('wood'),x,y0+.3,0,g,true);M(box(.2,.26,.008),mat('paper-svg'),x+.1,y0+.28,0,g,true);}}}},
+    {n:'Anker',x:-5.25,z:.4,r:Math.PI/2,hw:.5,hd:.35,b:function(g){M(cyl(.3,.34,.08,14),mat('wood'),0,.04,0,g);M(cyl(.05,.06,1.6,8),mat('draw'),0,.88,0,g);M(box(.7,.08,.08),mat('draw'),0,1.45,0,g,true);M(geo('anch1',function(){return new T.TorusGeometry(.3,.055,8,18,Math.PI);}),mat('draw'),0,.3,0,g).rotation.z=Math.PI;M(geo('anch2',function(){return new T.TorusGeometry(.1,.035,6,14);}),mat('draw'),0,1.72,0,g,true);
+      [-1,1].forEach(function(sd){M(cyl(.0,.1,.22,4),mat('draw'),sd*.3,.22,0,g,true).rotation.z=-sd*.5;});}},
+    {n:'Logbuchpult',x:-2,z:.6,hw:.5,hd:.4,b:function(g){M(rbox(.7,1.0,.5,.05),mat('wood'),0,0,0,g);var t=new T.Group();t.position.set(0,1.04,0);t.rotation.x=-.4;g.add(t);M(rbox(.8,.05,.55,.03),mat('wood'),0,0,0,t);M(box(.32,.03,.42),mat('paper-svg'),-.17,.06,0,t,true).rotation.z=.06;M(box(.32,.03,.42),mat('paper-svg'),.17,.06,0,t,true).rotation.z=-.06;M(box(.02,.035,.43),mat('roof-2'),0,.07,0,t,true);plate('Logbuch',.5,.16,'sign','sign-ink',g,0,.5,.255);}},
+    {n:'Frachtkisten mit Siegel',x:2,z:.6,hw:.55,hd:.4,b:function(g){M(rbox(.9,.55,.7,.05),mat('wood'),0,0,0,g);M(box(.94,.06,.1),mat('roof-5'),0,.3,.33,g,true);M(rbox(.7,.45,.55,.05),mat('wall-5'),0,.55,0,g);plate('Lizenz',.5,.16,'paper-svg','roof-2',g,0,.3,.36);M(cyl(.1,.1,.03,12),mat('roof-2'),.28,.36,.37,g,true).rotation.x=Math.PI/2;}},
+    {n:'Rettungsboot',x:-4.2,z:2.6,hw:.8,hd:.4,b:function(g){[-.4,.4].forEach(function(x){M(box(.1,.2,.5),mat('wood'),x,.1,0,g,true);});M(rbox(1.5,.3,.6,.14),mat('roof-1'),0,.2,0,g);M(box(.06,.04,.5),mat('wood'),0,.5,0,g,true);M(box(.06,.04,.5),mat('wood'),.4,.5,0,g,true);M(cyl(.02,.02,1.3,5),mat('wood'),-.2,.9,.28,g,true).rotation.z=.5;}}
+  ];
+  FURN.project=[
+    {n:'Ordnerwand',x:0,z:-3.7,hw:1.75,hd:.3,b:function(g){shelf(g,3.4,2.2,.5,false);for(var s=0;s<4;s++){var y0=.06+s*.52+.025;for(var i=0;i<12;i++){var bh=.34+((i*7+s)%3)*.05,x=-1.4+i*.255;M(box(.12,bh,.34),mat(BOOKC[(i+s*2)%5]),x,y0+bh/2,.02,g,true);M(box(.08,.1,.01),mat('paper-svg'),x,y0+bh*.6,.195,g,true);}}}},
+    {n:'Mappenschrank',x:-5.3,z:.4,r:Math.PI/2,hw:.5,hd:.35,b:function(g){cab(g,.9,1.3,.6,mat('stone-d'),3);}},
+    {n:'Projekttisch',x:-2,z:.6,hw:.85,hd:.85,b:function(g){table(g,1.7,.9,.78);chair(g,0,.7,Math.PI);M(rbox(.5,.04,.36,.02),mat('roof-1'),-.25,.78,0,g);M(box(.44,.012,.3),mat('paper-svg'),-.25,.835,0,g,true);M(box(.3,.012,.4),mat('paper-svg'),.25,.8,.02,g,true).rotation.y=.2;dlamp(g,.65,.78,-.25);}},
+    {n:'Pinnwand mit Projektzetteln',x:2,z:.6,hw:.85,hd:.2,b:function(g){M(box(.06,.75,.06),mat('wood'),-.65,.37,0,g);M(box(.06,.75,.06),mat('wood'),.65,.37,0,g);M(rbox(1.5,1.0,.06,.04),mat('wood'),0,.7,0,g);M(box(1.38,.88,.02),mat('wall-5'),0,1.2,.04,g,true);
+      plate('Ziel',.4,.18,'lit','draw',g,-.45,1.5,.06);plate('Zielgruppe',.6,.18,'roof-3','paper-svg',g,.2,1.5,.06);plate('Stil',.34,.18,'roof-4','paper-svg',g,-.45,1.2,.06);plate('Format',.46,.18,'roof-1','paper-svg',g,.05,1.2,.06);plate('Regeln',.46,.18,'roof-2','paper-svg',g,.5,1.2,.06);plate('Dateien',.5,.18,'paper-svg','draw',g,-.1,.9,.06);}},
+    {n:'Korb für Veraltetes',x:-4.2,z:2.6,hw:.45,hd:.3,b:function(g){M(cyl(.28,.22,.5,14),mat('wood'),0,.25,0,g);[[.05,.52,0],[-.1,.56,.06],[.12,.58,-.05]].forEach(function(p){M(sph(.1,8,6),mat('paper-svg'),p[0],p[1],p[2],g,true);});M(cyl(.02,.02,.9,5),mat('draw'),.45,.45,0,g,true);plate('Veraltet',.6,.2,'roof-2','paper-svg',g,.45,.98,.03);}}
+  ];
+  FURN.code=[
+    {n:'Monitorwand',x:0,z:-3.96,hw:0,hd:0,b:function(g){M(rbox(3.0,1.5,.08,.04),mat('draw'),0,.8,0,g);[-.95,0,.95].forEach(function(x,k){M(rbox(.8,.9,.04,.03),mat('stone-d'),x,1.0,.06,g);M(box(.7,.8,.01),mat('draw'),x,1.45,.1,g,true);for(var i=0;i<6;i++){var w=.15+((i*5+k*3)%5)*.08;M(box(w,.04,.01),glow(i%3===0?'roof-4':'lit'),x-.33+w/2,1.75-i*.12,.11,g,true);}});}},
+    {n:'Laptop-Werkbank',x:-2,z:.6,hw:.85,hd:.45,b:function(g){table(g,1.6,.8,.85);M(rbox(.5,.03,.34,.02),mat('stone-d'),-.25,.85,0,g);var sc=new T.Group();sc.position.set(-.25,.88,-.17);sc.rotation.x=-.3;g.add(sc);M(rbox(.5,.32,.02,.02),mat('stone-d'),0,0,0,sc);M(box(.44,.26,.01),glow('roof-4'),0,.16,.015,sc,true);for(var i=0;i<3;i++){M(box(.3-i*.05,.025,.01),mat('draw'),-.03,.07+i*.07,.02,sc,true);}
+      M(cyl(.012,.012,.2,6),mat('roof-2'),.4,.86,.05,g,true).rotation.z=Math.PI/2;[[.4,-.1],[.5,-.05],[.45,.12]].forEach(function(p,k){M(box(.07,.015,.07),mat(k%2?'lit':'roof-4'),p[0],.85,p[1],g,true);});}},
+    FURN.lab[2],
+    {n:'Backup-Laufwerke',x:-5.2,z:.4,r:Math.PI/2,hw:.55,hd:.3,b:function(g){M(rbox(.9,1.3,.5,.05),mat('stone-d'),0,0,0,g);for(var i=0;i<3;i++){var y=.15+i*.26;M(box(.76,.2,.02),mat('draw'),0,y+.1,.26,g,true);M(sph(.025,6,5),glow(i<2?'roof-4':'lit'),.3,y+.1,.285,g,true);M(box(.3,.03,.01),mat('stone'),-.15,y+.1,.275,g,true);}plate('Backup',.6,.18,'roof-4','paper-svg',g,0,1.05,.265);}},
+    FURN.lab[4]
+  ];
+  function furnList(id){var L=BYID[id].look||{};return FURN[L.room||L.kind]||FURN.school;}
   function allMask(id){return (1<<furnList(id).length)-1;}
   function isPlaced(id,k){return !!(placed[id]&(1<<k));}
   function countBits(n){var c=0;while(n){c+=n&1;n>>=1;}return c;}
@@ -573,7 +646,7 @@ KD.World=(function(){
     [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(q){M(cyl(.08,.1,.9,8),mat('wood'),q[0]*6.2,.45,q[1]*4.2,lv[0]);});
     M(box(12.4,.05,.05),mat('roof-2'),0,.7,-4.2,lv[0],true);M(box(12.4,.05,.05),mat('roof-2'),0,.7,4.2,lv[0],true);M(box(.05,.05,8.4),mat('roof-2'),-6.2,.7,0,lv[0],true);M(box(.05,.05,8.4),mat('roof-2'),6.2,.7,0,lv[0],true);
     /* Stufe 1: Boden */
-    var fl=FLOOR[L.kind]||'wood';
+    var fl=FLOOR[L.room||L.kind]||'wood';
     M(rbox(12.6,.3,8.6,.2),mat(fl),0,-.28,0,lv[1]);
     if(fl==='wood'){for(i=-5;i<=5;i++){M(box(.03,.01,8.3),mat('sign'),i*1.1,.025,0,lv[1],true);}}
     else{for(i=-5;i<=5;i++){M(box(.025,.01,8.3),mat('stone-d'),i*1.1,.025,0,lv[1],true);}for(i=-3;i<=3;i++){M(box(12.3,.01,.025),mat('stone-d'),0,.025,i*1.1,lv[1],true);}}
@@ -946,7 +1019,7 @@ KD.World=(function(){
     var out=[];
     if(mode==='room'&&room){
       var RO=room;
-      out.push({key:'x',x:0,z:3.4,r:1.3,auto:.55,label:'Hinaus ins Dorf',say:'Du stehst an der Tür. Mit Enter gehst du hinaus ins Dorf.',fn:function(){location.hash='#dorf';}});
+      out.push({key:'x',x:0,z:3.4,r:1.3,auto:.55,label:'Hinaus ins Dorf',say:'Du stehst an der Tür. Mit Enter gehst du hinaus ins Dorf.',fn:function(){doorFlag=true;location.hash='#dorf';}});
       RO.stations.forEach(function(s,i){out.push({key:'s'+i,x:s.gx,z:s.gz,r:1.2,label:STN[i].act,say:STN[i].say+' Mit Enter öffnest du es.',fn:function(){KD.app.openStep(['f','t','e'][i]);}});});
       return out;
     }

@@ -68,7 +68,10 @@ KD.IMPRESSUM = {
   hinweise: [
     'Alle Beispiele in den Aufgaben sind erfunden.',
     'Angaben zu Tools haben den Stand ' + KD.STAND + ' und ändern sich. Für Claude wurden sie am ' + KD.ABRUF + ' an den Seiten des Anbieters geprüft, für andere Tools nicht einzeln.',
-    'Das Dorf ist keine Rechtsberatung und ersetzt keine interne Vorgabe.'
+    'Das Dorf ist keine Rechtsberatung und ersetzt keine interne Vorgabe.',
+    'Die Prompts der Promptsammlung sind auf Aufbau, Platzhalter und Datenschutz geprüft, aber in keinem KI-Tool getestet. Die Beschreibungen typischer Ergebnisse sind keine echten Läufe.',
+    'Checklisten, Vorlagen und Regeln senken Risiken, schließen sie aber nicht aus. Ob ein Tool sich daran hält, prüfst du an echten Aufgaben.',
+    'Welche Funktionen du nutzen kannst, hängt von Tool, Tarif und der Freigabe deiner Organisation ab.'
   ],
   daten: [
     'Das Dorf sendet nichts und kennt keine Konten. Es speichert nur in diesem Browser: Lernstand, Einstellungen, angehakte Checklisten, gesammelte Tipps und die Wörter der Wordcloud. Keine Namen, keine Antworttexte.',

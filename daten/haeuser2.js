@@ -281,7 +281,7 @@ KD.HOUSES = KD.HOUSES.concat([
 },
 {
   id: 'labor', slot: 15, name: 'Labor', sub: 'Zusatz: Code für Laptop-Probleme', npc: 'kito', ic: 'kolben', extra: true,
-  look: {wall: 'wall-4', roof: 'roof-4', roofType: 'dome', emblem: 'flask', kind: 'lab'},
+  look: {wall: 'wall-4', roof: 'roof-4', roofType: 'dome', emblem: 'flask', kind: 'lab', room: 'code'},
   q0: {q: 'Die KI schlägt einen Befehl vor, der „alles aufräumt“. Du verstehst ihn nicht. Was tust du?', opts: ['Ausführen, die KI weiß, was sie tut.', 'Erst Zeile für Zeile erklären lassen und an einer Kopie testen.', 'Mit Administratorrechten ausführen, dann klappt es sicher.'], a: 1, why: 'Nichts ausführen, was du nicht erklären könntest. Auf Dienstgeräten fragst du vorher die IT.'},
   cards: [
     {k: 'Wozu Code?', v: 'Für kleine, lästige Aufgaben: 300 Dateien umbenennen, eine Tabelle umformen, doppelte Einträge finden. Du musst dafür nicht programmieren können.', ic: 'kolben'},

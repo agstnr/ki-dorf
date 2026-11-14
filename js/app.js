@@ -223,7 +223,7 @@ function stepF(x, el, api) {
     var c = x.cards[i]; ui.card[x.id] = i;
     KD.clear(box);
     KD.add(box, [h('article', {class: 'fcard', 'aria-labelledby': 'fc-h'}, c.fig ? h('div', {class: 'figbox'}, KD.fig(c.fig)) : h('div', {class: 'bigic', 'aria-hidden': 'true'}, KD.icon(c.ic || x.ic)),
-      h('div', {class: 'fbody'}, h('p', {class: 'eyebrow'}, 'Karte ' + (i + 1) + ' von ' + n), h('h3', {id: 'fc-h', tabindex: '-1'}, c.k), h('p', null, c.v), srcRow(c.src)))]);
+      h('div', {class: 'fbody'}, h('p', {class: 'eyebrow'}, 'Karte ' + (i + 1) + ' von ' + n), h('h3', {id: 'fc-h', tabindex: '-1'}, c.k), h('p', null, c.v)))]);
     KD.clear(dots); x.cards.forEach(function (cc, k) { dots.appendChild(h('li', null, btn('dot' + (k === i ? ' on' : ''), h('span', {class: 'sr'}, 'Karte ' + (k + 1) + ': ' + cc.k), function () { i = k; draw(true); }, {'aria-current': k === i ? 'true' : null}))); });
     KD.clear(nav);
     KD.add(nav, [btn('btn ghost', [KD.icon('pfeill'), ' Zurück'], function () { i -= 1; draw(true); }, {disabled: i === 0}), dots,
@@ -232,7 +232,7 @@ function stepF(x, el, api) {
     if (focus) { box.querySelector('#fc-h').focus(); }
   }
   draw(false);
-  KD.add(el, [box, nav, h('p', {class: 'small'}, 'Alle Karten stehen auch als Text in der ', link('#bibliothek', 'Bibliothek'), '. Stand der Angaben: ' + KD.STAND + '.')]);
+  KD.add(el, [box, nav]);
 }
 function stepT(x, el, api) {
   var ti = Math.min(ui.task[x.id] === undefined ? firstOpen(x) : ui.task[x.id], x.tasks.length - 1), pills = h('div', {class: 'pills', role: 'group', 'aria-label': 'Aufgaben'}), body = h('div', {class: 'taskbody'});
@@ -266,7 +266,7 @@ function stepE(x, el) {
     h('div', {class: 'tplhead'}, h('h3', null, e.tplTitle), btn('btn ghost', [KD.icon('kopie'), ' Text kopieren'], function () { KD.copy(e.tpl, msg, 'Kopiert.'); })), pre, msg,
     h('fieldset', {class: 'checks'}, h('legend', null, e.checkTitle), e.checks.map(function (c, i) { var inp = h('input', {type: 'checkbox', onchange: function () { if (inp.checked) { st.c[i] = 1; } else { delete st.c[i]; } S.save(); }}); inp.checked = !!st.c[i]; return h('label', {class: 'chk'}, inp, h('span', null, c)); })),
     e.link ? h('div', {class: 'extbox'}, h('h3', null, 'Feedback an die Seminarleitung'), h('p', null, 'Das Feedback-Formular liegt bei Google Forms. Wenn du es öffnest, verlässt du das Dorf, und deine Angaben gehen an Google. Bitte keine Namen eintragen. Ohne Internet nutzt du die Vorlage oben.'), link(FEEDBACK_URL, ['Formular bei Google öffnen', h('span', {class: 'sr'}, ' (öffnet in neuem Tab)')], 'btn ghost ext', {target: '_blank', rel: 'noopener noreferrer'})) : null,
-    e.note ? h('p', {class: 'note'}, e.note) : null]);
+    null]);
 }
 /* Wordcloud: nur für das Gerät der Trainerin. Nichts wird gesendet. */
 function stepW(x, el) {
@@ -282,7 +282,7 @@ function stepW(x, el) {
   draw();
   KD.add(el, [h('p', null, 'Die Teilnehmenden rufen ihre Erwartungen zu, du tippst sie hier ein und zeigst die Wolke am Beamer. Ein bis drei Wörter, keine Namen.'),
     h('div', {class: 'row'}, h('label', {for: 'wcin'}, 'Wort'), inp, btn('btn', 'Hinzufügen', add), btn('btn ghost', 'Letztes entfernen', function () { D.wc.pop(); S.save(); draw(); }), btn('btn ghost', 'Leeren', function () { D.wc = []; S.save(); draw(); })),
-    cloud, msg, h('p', {class: 'note'}, 'Die Wörter bleiben nur in diesem Browser auf diesem Gerät. Die Teilnehmenden sehen sie nur über deinen Bildschirm. Das Dorf kann keine Eingaben mehrerer Personen einsammeln, weil es dafür einen Server bräuchte.')]);
+    cloud, msg]);
 }
 
 /* ---------- Dorfrunde ---------- */
@@ -322,7 +322,7 @@ function houseText(x) {
     h('dl', {class: 'terms'}, x.cards.map(function (c) { return [h('dt', null, c.k), h('dd', null, c.v)]; })),
     h('h4', null, e.checkTitle), h('ul', null, e.checks.map(function (c) { return h('li', null, c); })),
     h('div', {class: 'tplhead'}, h('h4', null, e.tplTitle), btn('btn ghost', [KD.icon('kopie'), ' Kopieren'], function () { KD.copy(e.tpl, msg, 'Kopiert.'); }, {'aria-label': 'Vorlage kopieren: ' + e.tplTitle}), msg), h('pre', null, e.tpl),
-    e.note ? h('p', {class: 'note'}, e.note) : null, Object.keys(keys).length ? [h('h4', null, 'Quellen'), srcRow(Object.keys(keys))] : null,
+    
     h('p', null, link('#haus/' + x.id, ['Zum Haus ', KD.icon('pfeil')], 'more')));
 }
 function viewBib() {
@@ -336,8 +336,7 @@ function viewBib() {
     if (ui.q) { return search(); }
     if (ui.bib === 'inhalte') { KD.add(body, [h('h2', null, 'Inhalte nach Seminarblock'), h('p', {class: 'small'}, 'Stand: ' + KD.STAND + '. Tippe ein Haus an, um es aufzuklappen.'), KD.HOUSES.map(houseText)]); }
     if (ui.bib === 'prompts') {
-      KD.add(body, [h('h2', null, 'Promptsammlung'), h('p', {class: 'note'}, 'Die Prompts sind auf Aufbau, Platzhalter und Datenschutz geprüft. Sie wurden nicht in einem KI-Tool getestet. „Was typischerweise entsteht“ ist eine Beschreibung und kein echtes Ergebnis. Ersetze alles in [eckigen Klammern] und prüfe jede Antwort.'),
-        KD.PROMPT_GRUPPEN.map(function (g, gi) { return h('section', null, h('h3', null, g), h('div', {class: 'pgrid'}, KD.PROMPTS.filter(function (p) { return p.g === gi; }).map(promptCard))); })]);
+      KD.add(body, [h('h2', null, 'Promptsammlung'), KD.PROMPT_GRUPPEN.map(function (g, gi) { return h('section', null, h('h3', null, g), h('div', {class: 'pgrid'}, KD.PROMPTS.filter(function (p) { return p.g === gi; }).map(promptCard))); })]);
     }
     if (ui.bib === 'glossar') { KD.add(body, [h('h2', null, 'Glossar'), h('dl', {class: 'terms'}, KD.GLOSSAR.map(function (g) { return [h('dt', null, g[0]), h('dd', null, g[1], ' ', link('#haus/' + g[2], KD.BYID[g[2]].name, 'more'))]; }))]); }
     if (ui.bib === 'quellen') {
@@ -347,8 +346,7 @@ function viewBib() {
         h('ul', {class: 'lit'}, KD.SRC_LERN.map(function (q) { return h('li', null, q[0], ' ', link(q[1], q[1], 'ext', {target: '_blank', rel: 'noopener noreferrer'}), h('br'), h('span', {class: 'small'}, 'Wofür: ' + q[2])); }))]);
     }
     if (ui.bib === 'stand') {
-      KD.add(body, [h('h2', null, 'Stand der Tool-Angaben'), h('p', {class: 'note'}, 'Geprüft für Claude am ' + KD.ABRUF + ' auf den Hilfeseiten von Anthropic. Für ChatGPT und andere Tools haben wir keine Einzelangaben geprüft: Dort heißen Funktionen anders und gelten andere Tarife. Sieh auf der Hilfeseite deines Anbieters nach. Alles hier kann sich ändern.'),
-        h('div', {class: 'tablewrap'}, h('table', {class: 'tbl'}, h('thead', null, h('tr', null, h('th', {scope: 'col'}, 'Funktion in Claude'), h('th', {scope: 'col'}, 'Verfügbar'), h('th', {scope: 'col'}, 'Quelle'))), h('tbody', null, KD.TOOLSTAND.map(function (r) { return h('tr', null, h('th', {scope: 'row'}, r[0]), h('td', null, r[1]), h('td', null, srcBadge(r[2]))); }))))]);
+      KD.add(body, [h('h2', null, 'Stand der Tool-Angaben'), h('div', {class: 'tablewrap'}, h('table', {class: 'tbl'}, h('thead', null, h('tr', null, h('th', {scope: 'col'}, 'Funktion in Claude'), h('th', {scope: 'col'}, 'Verfügbar'), h('th', {scope: 'col'}, 'Quelle'))), h('tbody', null, KD.TOOLSTAND.map(function (r) { return h('tr', null, h('th', {scope: 'row'}, r[0]), h('td', null, r[1]), h('td', null, srcBadge(r[2]))); }))))]);
     }
   }
   function search() {

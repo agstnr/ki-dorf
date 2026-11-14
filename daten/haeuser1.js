@@ -122,7 +122,7 @@ KD.HOUSES = [
 },
 {
   id: 'projekthaus', slot: 3, name: 'Projekthaus', sub: 'Kontext und Projekte', npc: 'mira', ic: 'ordner',
-  look: {wall: 'wall-2', roof: 'roof-3', roofType: 'gable', emblem: 'book', w: 4.8, kind: 'library'},
+  look: {wall: 'wall-2', roof: 'roof-3', roofType: 'gable', emblem: 'book', w: 4.8, kind: 'library', room: 'project'},
   q0: {q: 'Du stellst zweimal dieselbe Frage. Einmal weiß die KI, für wen du schreibst und wozu, einmal nicht. Was erwartest du?', opts: ['Kein Unterschied, das Modell ist dasselbe.', 'Die Antwort mit Kontext passt besser zu meiner Aufgabe.', 'Die Antwort ohne Kontext ist neutraler und darum besser.'], a: 1, why: 'Fehlt etwas, füllt die KI die Lücke mit Wahrscheinlichem. Dass Kontext der größte Hebel ist, ist Erfahrungswissen aus der Praxis und kein gemessener Effekt.'},
   cards: [
     {k: 'Kontext', v: 'Die KI antwortet nur auf Basis dessen, was im Gespräch steht. Guter Kontext ist darum der schnellste Weg zu passenden Antworten.', ic: 'zettel', src: ['erf']},
