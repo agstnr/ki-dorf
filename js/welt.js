@@ -403,7 +403,7 @@ KD.World=(function(){
   var BOOKC=['roof-2','roof-1','roof-3','roof-5','roof-4'];
   var FLOOR={vault:'stone',archive:'stone',lab:'paper-svg',station:'stone',tower:'stone',remise:'stone',warehouse:'stone',code:'paper-svg'};
   var STN=[
-    {stage:'Fundament',act:'Fundament lesen',x:-4.6,z:-2.7,hw:.45,hd:.4,say:'Am Lesepult liest du das Fundament.'},
+    {stage:'Fundament',act:'Fundament errichten',x:-4.6,z:-2.7,hw:.45,hd:.4,say:'Am Lesepult liest du das Fundament.'},
     {stage:'Aufgaben',act:'Aufgaben lösen',x:4.6,z:-2.7,hw:.8,hd:.5,say:'Am Bautisch löst du die Aufgaben.'},
     {stage:'Einrichtung',act:'Einrichtung öffnen',x:4.8,z:2.5,hw:.6,hd:.5,say:'In der Kiste liegen Vorlage und Checkliste.'}
   ];
@@ -717,6 +717,7 @@ KD.World=(function(){
     var sc=active();if(player.parent!==sc){sc.add(player);}
     var nm=m==='room'?BYID[id].name:'';
     el.setAttribute('aria-label',m==='room'?'Im Haus: '+nm:'KI-Dorf in 3D');
+    el.classList.toggle('in-room',m==='room');
     chips(m==='room'?'Enter: lesen, lösen, hinausgehen':'Enter: ansprechen, Baum schütteln');
     el.querySelector('#worldHelp').textContent=m==='room'?'Du bist im Haus '+nm+'. Mit den Pfeiltasten oder W, A, S, D läufst du. Am Lesepult öffnest du das Fundament, am Bautisch die Aufgaben, an der Kiste die Einrichtung, jeweils mit Enter. Durch die Tür gehst du hinaus. Mit der Tabulatortaste verlässt du den Raum und kommst zum Text.':'Klick ins Dorf oder geh mit der Tabulatortaste hinein. Mit den Pfeiltasten oder W, A, S, D läufst du. Lauf durch eine Haustür, dann bist du im Haus. Enter vor der Tür geht auch. Neben einer Figur sprichst du sie mit Enter an, einen Baum schüttelst du mit Enter, dann fällt ein Tipp herunter. Mit der Tabulatortaste verlässt du das Dorf. Die Karte darunter führt ebenfalls in jedes Haus.';
   }

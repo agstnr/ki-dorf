@@ -172,9 +172,23 @@ function viewHaus(x) {
   var stage = h('section', {class: 'stage', id: 'stage', 'aria-labelledby': 'stage-h'}), tabs = h('div', {class: 'steps', role: 'group', 'aria-label': 'Schritte im Haus'});
   var pbar = bar(S.pct(x), 'Fortschritt in diesem Haus'), plabel = h('span', {class: 'small'}), art = h('div', {class: 'hausart'});
   var world = use3d() && x.look ? h('div', {id: 'worldSlot'}) : null;
-  var fsTog = btn('fs-toggle', 'Karten ausblenden', function () { var min = main.classList.toggle('fs-min'); fsTog.textContent = min ? 'Karten zeigen' : 'Karten ausblenden'; fsTog.setAttribute('aria-expanded', String(!min)); }, {'aria-expanded': 'true'});
-  var main = h('div', {class: 'hausmain'}, fsTog, tabs, stage);
-  houseRefs = {x: x, refresh: refresh, show: show, open: function () { main.classList.remove('fs-min'); fsTog.textContent = 'Karten ausblenden'; fsTog.setAttribute('aria-expanded', 'true'); }};
+  var content = h('div', {class: 'house-content', id: 'house-content', hidden: !!world}, tabs, stage);
+  var launch = h('div', {class: 'house-actions', hidden: !world});
+  var close = btn('btn ghost', 'Karten schließen', function () { setOpen(false); launch.querySelector('button').focus(); }, {hidden: true});
+  var foundation = btn('btn next-action', ['Fundament errichten ', KD.icon('pfeil')], function () { openStep('f'); }, {'aria-controls': 'house-content'});
+  if (world) { KD.add(launch, [foundation, x.q0 ? btn('btn ghost', 'Einstiegsfrage', function () { openStep('q'); }) : null]); }
+  var main = h('div', {class: 'hausmain'}, launch, close, content);
+  houseRefs = {openStep: openStep};
+  function setOpen(open) {
+    content.hidden = !open;
+    launch.hidden = open;
+    close.hidden = !open;
+  }
+  function openStep(k) {
+    if (!sl.some(function (s) { return s[0] === k; })) { return; }
+    if (world) { setOpen(true); }
+    show(k, true);
+  }
   function refresh() {
     var lv = S.level(x), p = S.pct(x);
     setW(pbar.firstChild, p); pbar.setAttribute('aria-valuenow', Math.round(p * 100));
@@ -198,8 +212,18 @@ function viewHaus(x) {
         npc ? btn('npcbtn inline', [npcFace(npc), h('span', null, 'Tipp von ' + npc.name)], function (e) { openNpc(npc.id, e.currentTarget); }) : null)),
       world ? h('aside', {class: 'roomwrap', 'aria-label': 'Blick ins Haus'}, world) : null,
       main)]);
-  show(cur, false);
-  if (world) { KD.World.attach(world, x.id); } else if (KD.World) { KD.World.detach(); }
+  if (world && KD.World.attach(world, x.id)) { refresh(); }
+  else {
+    if (KD.World) { KD.World.detach(); }
+    if (world) {
+      world.parentNode.remove();
+      main.parentNode.classList.remove('with3d');
+      launch.hidden = true;
+      content.hidden = false;
+      world = null;
+    }
+    show(cur, false);
+  }
 }
 function stageHead(el, tag, title) { KD.add(el, [h('p', {class: 'eyebrow'}, tag), h('h2', {id: 'stage-h', tabindex: '-1'}, title)]); }
 
@@ -209,7 +233,7 @@ function stepQ(x, el, api) {
   function reveal(i) {
     Array.prototype.forEach.call(opts.children, function (b, k) { b.disabled = true; if (k === q.a) { b.classList.add('is-right'); } else if (k === i) { b.classList.add('is-wrong'); } });
     KD.clear(out);
-    KD.add(out, [h('p', {class: 'fb fb-' + (q.a < 0 || i === q.a ? 'ok' : 'solved')}, KD.icon(q.a < 0 || i === q.a ? 'haken' : 'pfeil'), h('strong', null, q.a < 0 ? 'Notiert. ' : i === q.a ? 'Gut geschätzt. ' : 'Knapp daneben, und genau dafür ist die Frage da. '), q.why), btn('btn', ['Weiter zum Fundament ', KD.icon('pfeil')], api.next)]);
+    KD.add(out, [h('p', {class: 'fb fb-' + (q.a < 0 || i === q.a ? 'ok' : 'solved')}, KD.icon(q.a < 0 || i === q.a ? 'haken' : 'pfeil'), h('strong', null, q.a < 0 ? 'Notiert. ' : i === q.a ? 'Gut geschätzt. ' : 'Knapp daneben, und genau dafür ist die Frage da. '), q.why), btn('btn next-action', ['Weiter zum Fundament ', KD.icon('pfeil')], api.next)]);
     if (!st.q) { st.q = 1; S.save(); api.refresh(); }
   }
   q.opts.forEach(function (o, i) { opts.appendChild(btn('choice', o, function () { reveal(i); out.querySelector('.btn').focus(); })); });
@@ -227,7 +251,7 @@ function stepF(x, el, api) {
     KD.clear(dots); x.cards.forEach(function (cc, k) { dots.appendChild(h('li', null, btn('dot' + (k === i ? ' on' : ''), h('span', {class: 'sr'}, 'Karte ' + (k + 1) + ': ' + cc.k), function () { i = k; draw(true); }, {'aria-current': k === i ? 'true' : null}))); });
     KD.clear(nav);
     KD.add(nav, [btn('btn ghost', [KD.icon('pfeill'), ' Zurück'], function () { i -= 1; draw(true); }, {disabled: i === 0}), dots,
-      i < n - 1 ? btn('btn', ['Weiter ', KD.icon('pfeil')], function () { i += 1; draw(true); }) : btn('btn', [x.tasks.length ? 'Zu den Aufgaben ' : 'Zum Fahrplan ', KD.icon('pfeil')], api.next)]);
+      i < n - 1 ? btn('btn next-action', ['Nächste Karte ', KD.icon('pfeil')], function () { i += 1; draw(true); }) : btn('btn next-action', [x.tasks.length ? 'Zu den Aufgaben ' : 'Zum Fahrplan ', KD.icon('pfeil')], api.next)]);
     if (i === n - 1 && !st.f) { st.f = 1; S.save(); api.refresh(); KD.say('Fundament gelegt.'); }
     if (focus) { box.querySelector('#fc-h').focus(); }
   }
@@ -247,26 +271,39 @@ function stepT(x, el, api) {
     var after = h('div', {class: 'after', role: 'status'});
     KD.add(body, [h('p', {class: 'eyebrow'}, KD.T.name(t)), h('h3', {id: 'task-h', tabindex: '-1'}, t.title), h('p', {class: 'lead'}, t.intro)]);
     var root = h('div', {class: 'task task-' + t.type}); body.appendChild(root); body.appendChild(after);
+    var rendering = true;
+    function showNext() {
+      KD.clear(after);
+      var nx = -1;
+      for (var k = 1; k <= x.tasks.length; k++) {
+        var c = (ti + k) % x.tasks.length;
+        if (!S.taskDone(x, c)) { nx = c; break; }
+      }
+      var next = nx >= 0 && nx !== ti
+        ? btn('btn next-action', ['Nächste Aufgabe: ' + x.tasks[nx].title + ' ', KD.icon('pfeil')], function () { ti = nx; draw(true); })
+        : btn('btn next-action', ['Zur Einrichtung ', KD.icon('pfeil')], api.next);
+      if (nx < 0) { after.appendChild(h('p', {class: 'okline'}, KD.icon('haken'), ' Alle Aufgaben in diesem Haus sind gelöst.')); }
+      after.appendChild(next);
+      if (!rendering) { next.focus(); }
+    }
     KD.T.render(root, t, {hid: x.id, ti: ti, onUnit: function () { var before = +(el.getAttribute('data-lv') || 0), lv = S.level(x); api.refresh(); drawPills(); if (lv > before) { el.setAttribute('data-lv', lv); KD.say('Dein Haus ist gewachsen: ' + LV[lv] + '.'); toast(LV[lv] + ': ' + x.name + ' ist gewachsen.'); } },
-      onAll: function () {
-        KD.clear(after);
-        var nx = -1; for (var k = 1; k <= x.tasks.length; k++) { var c = (ti + k) % x.tasks.length; if (!S.taskDone(x, c)) { nx = c; break; } }
-        if (nx >= 0 && nx !== ti) { after.appendChild(btn('btn', ['Nächste Aufgabe: ' + x.tasks[nx].title + ' ', KD.icon('pfeil')], function () { ti = nx; draw(true); })); }
-        else { KD.add(after, [h('p', {class: 'okline'}, KD.icon('haken'), ' Alle Aufgaben in diesem Haus sind gelöst.'), btn('btn', ['Zur Einrichtung ', KD.icon('pfeil')], api.next)]); }
-      }});
+      onAll: showNext});
+    if (S.taskDone(x, ti) && !after.firstChild) { showNext(); }
+    rendering = false;
     if (focus) { body.querySelector('#task-h').focus(); }
   }
   el.setAttribute('data-lv', S.level(x));
   KD.add(el, [pills, body]); draw(false);
 }
-function stepE(x, el) {
+function stepE(x, el, api) {
   var e = x.einr, st = S.hs(x.id), msg = h('p', {class: 'small', role: 'status'}), pre = h('pre', {id: 'tpl'}, e.tpl);
   stageHead(el, x.platz ? 'Fahrplan' : 'Einrichtung', e.title);
   KD.add(el, [h('p', {class: 'small'}, x.platz ? '' : 'Das hier nimmst du mit in dein eigenes Tool. Die Checkliste ist für dich und sperrt nichts.'),
     h('div', {class: 'tplhead'}, h('h3', null, e.tplTitle), btn('btn ghost', [KD.icon('kopie'), ' Text kopieren'], function () { KD.copy(e.tpl, msg, 'Kopiert.'); })), pre, msg,
     h('fieldset', {class: 'checks'}, h('legend', null, e.checkTitle), e.checks.map(function (c, i) { var inp = h('input', {type: 'checkbox', onchange: function () { if (inp.checked) { st.c[i] = 1; } else { delete st.c[i]; } S.save(); }}); inp.checked = !!st.c[i]; return h('label', {class: 'chk'}, inp, h('span', null, c)); })),
     e.link ? h('div', {class: 'extbox'}, h('h3', null, 'Feedback an die Seminarleitung'), h('p', null, 'Das Feedback-Formular liegt bei Google Forms. Wenn du es öffnest, verlässt du das Dorf, und deine Angaben gehen an Google. Bitte keine Namen eintragen. Ohne Internet nutzt du die Vorlage oben.'), link(FEEDBACK_URL, ['Formular bei Google öffnen', h('span', {class: 'sr'}, ' (öffnet in neuem Tab)')], 'btn ghost ext', {target: '_blank', rel: 'noopener noreferrer'})) : null,
-    null]);
+    h('div', {class: 'after'}, x.platz ? btn('btn next-action', ['Zur Wordcloud ', KD.icon('pfeil')], api.next)
+      : link('#dorf', ['Zurück ins Dorf ', KD.icon('pfeil')], 'btn next-action'))]);
 }
 /* Wordcloud: nur für das Gerät der Trainerin. Nichts wird gesendet. */
 function stepW(x, el) {
@@ -282,7 +319,7 @@ function stepW(x, el) {
   draw();
   KD.add(el, [h('p', null, 'Die Teilnehmenden rufen ihre Erwartungen zu, du tippst sie hier ein und zeigst die Wolke am Beamer. Ein bis drei Wörter, keine Namen.'),
     h('div', {class: 'row'}, h('label', {for: 'wcin'}, 'Wort'), inp, btn('btn', 'Hinzufügen', add), btn('btn ghost', 'Letztes entfernen', function () { D.wc.pop(); S.save(); draw(); }), btn('btn ghost', 'Leeren', function () { D.wc = []; S.save(); draw(); })),
-    cloud, msg]);
+    cloud, msg, link('#dorf', ['Zurück ins Dorf ', KD.icon('pfeil')], 'btn next-action')]);
 }
 
 /* ---------- Dorfrunde ---------- */
@@ -303,7 +340,7 @@ function viewRunde() {
     }
     var c = cards[i], x = KD.BYID[c.hid], t = x.tasks[c.ti], root = h('div', {class: 'task task-' + t.type}), after = h('div', {class: 'after'});
     KD.add(box, [h('p', {class: 'eyebrow'}, 'Karte ' + (i + 1) + ' von ' + cards.length + ' · aus: ' + x.name), h('h2', {id: 'stage-h', tabindex: '-1'}, t.title), root, after]);
-    KD.T.render(root, t, {hid: c.hid, ti: c.ti, only: [c.ii], round: true, onUnit: function (cid, first) { if (first) { right += 1; } }, onAll: function () { var nb = btn('btn', [i + 1 < cards.length ? 'Nächste Karte ' : 'Zum Ergebnis ', KD.icon('pfeil')], function () { i += 1; show(); }); KD.clear(after).appendChild(nb); nb.focus(); }});
+    KD.T.render(root, t, {hid: c.hid, ti: c.ti, only: [c.ii], round: true, onUnit: function (cid, first) { if (first) { right += 1; } }, onAll: function () { var nb = btn('btn next-action', [i + 1 < cards.length ? 'Nächste Karte ' : 'Zum Ergebnis ', KD.icon('pfeil')], function () { i += 1; show(); }); KD.clear(after).appendChild(nb); nb.focus(); }});
     box.querySelector('#stage-h').focus();
   }
   show();
@@ -434,7 +471,7 @@ KD.app = {
   go: function (id) { location.hash = '#haus/' + id; },
   npc: function (id) { openNpc(id, null); },
   pos: function (x, z, on) { if (posDot && posDot.isConnected) { posDot.setAttribute('cx', x.toFixed(1)); posDot.setAttribute('cy', z.toFixed(1)); posDot.setAttribute('visibility', on ? 'visible' : 'hidden'); } },
-  openStep: function (k) { if (houseRefs.show) { houseRefs.open(); houseRefs.show(k, true); } },
+  openStep: function (k) { if (houseRefs.openStep) { houseRefs.openStep(k); } },
   help: openHelp
 };
 

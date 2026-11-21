@@ -128,7 +128,7 @@ function markOne(root, t, ctx) {
 /* ---------- Szenario: Entscheidungen mit Folgen ---------- */
 T.scenario = function (root, t, ctx) {
   var idx = ctx.only ? ctx.only[0] : 0, wrap = h('div', {class: 'scen'});
-  function show(i) {
+  function show(i, focus) {
     var st = t.steps[i], cid = ctx.hid + '.' + ctx.ti + '.' + i, tries = 0, out = h('div', {class: 'fbwrap'}), opts = h('div', {class: 'choices col'});
     var box = h('div', {class: 'scenstep'}, h('p', {class: 'scentag'}, ctx.only ? 'Entscheidung' : 'Entscheidung ' + (i + 1) + ' von ' + t.steps.length), h('p', {class: 'scentext'}, st.t), opts, out);
     var done = isDone(ctx, cid);
@@ -141,8 +141,15 @@ T.scenario = function (root, t, ctx) {
       opts.appendChild(b);
     });
     function lockAll(right) { Array.prototype.forEach.call(opts.children, function (c) { c.disabled = true; }); right.classList.add('is-right'); }
-    function next() { if (!ctx.only && i + 1 < t.steps.length) { show(i + 1); } else if (ctx.onAll) { ctx.onAll(); } }
+    function next() {
+      if (!ctx.only && i + 1 < t.steps.length) {
+        var onward = btn('btn next-action', ['Zur nächsten Entscheidung ', KD.icon('pfeil')], function () { onward.remove(); show(i + 1, true); });
+        out.appendChild(onward);
+        onward.focus();
+      } else if (ctx.onAll) { ctx.onAll(); }
+    }
     wrap.appendChild(box);
+    if (focus) { var prompt = box.querySelector('.scentext'); prompt.tabIndex = -1; prompt.focus(); }
     if (done && !ctx.only && i + 1 < t.steps.length) { show(i + 1); }
   }
   show(idx);
@@ -247,7 +254,7 @@ T.pairs = function (root, t, ctx) {
     function roundDone() {
       var last = ri + 1 >= rounds.length, nextBonus = !last && rounds[ri + 1].bonus;
       if (ri + 1 === nPflicht && !done) { done = true; finish(ctx, cid, errors === 0); if (ctx.onAll) { ctx.onAll(); } }
-      if (!last) { var nb = btn('btn' + (nextBonus ? ' ghost' : ''), nextBonus ? 'Bonusrunde spielen' : 'Weiter zu ' + rounds[ri + 1].name, function () { show(ri + 1); }); out.appendChild(nb); nb.focus(); }
+      if (!last) { var nb = btn('btn' + (nextBonus ? ' ghost' : ' next-action'), nextBonus ? 'Bonusrunde spielen' : 'Weiter zu ' + rounds[ri + 1].name, function () { show(ri + 1); }); out.appendChild(nb); if (!nextBonus || ctx.round) { nb.focus(); } }
       else { out.appendChild(fb('ok', 'Alle Paare gefunden.')); }
     }
     KD.add(wrap, [h('p', {class: 'scentag'}, R.name + ' · ' + R.list.length + ' Paare'), h('div', {class: 'pairs'}, left, right), out]);
@@ -363,7 +370,7 @@ SIM.reise = function (root, t, ctx, cid, done) {
     }
     KD.clear(nav);
     KD.add(nav, [btn('btn ghost', [KD.icon('pfeill'), ' Zurück'], function () { st.i -= 1; draw(); nav.firstChild.focus(); }, {disabled: st.i === 0}),
-      st.i < N.length - 1 ? btn('btn', ['Weiter ', KD.icon('pfeil')], function () { st.i += 1; draw(); nav.lastChild.focus(); }) : fb('ok', 'Reise beendet.')]);
+      st.i < N.length - 1 ? btn('btn next-action', ['Weiter ', KD.icon('pfeil')], function () { st.i += 1; draw(); nav.lastChild.focus(); }) : fb('ok', 'Reise beendet.')]);
     live.textContent = 'Station ' + (st.i + 1) + ': ' + N[st.i][0];
     if (st.i === N.length - 1 && !done) { done = true; finish(ctx, cid, true); if (ctx.onAll) { ctx.onAll(); } }
   }
