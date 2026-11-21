@@ -380,7 +380,7 @@ SIM.reise = function (root, t, ctx, cid, done) {
     if (st.i === N.length - 1 && !done) { done = true; finish(ctx, cid, true); if (ctx.onAll) { ctx.onAll(); } }
   }
   draw();
-  KD.add(root, [fig, body, nav, live, h('p', {class: 'small'}, 'Angaben zu Claude laut Anbieterseiten, Stand ' + KD.ABRUF + '. Für Team- und Enterprise-Tarife gelten eigene Bedingungen. Keine Rechtsberatung.')]);
+  KD.add(root, [fig, body, nav, live]);
 };
 T.sim = function (root, t, ctx) { var cid = ctx.hid + '.' + ctx.ti + '.x'; (SIM[t.sim] || function () {})(root, t, ctx, cid, isDone(ctx, cid)); };
 

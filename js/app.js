@@ -369,13 +369,13 @@ function viewBib() {
     KD.clear(nav); tabs.forEach(function (t) { nav.appendChild(btn('pill', t[1], function () { ui.bib = t[0]; ui.q = ''; inp.value = ''; draw(); }, {'aria-current': ui.bib === t[0] && !ui.q ? 'true' : null})); });
     KD.clear(body); count.textContent = '';
     if (ui.q) { return search(); }
-    if (ui.bib === 'inhalte') { KD.add(body, [h('h2', null, 'Inhalte nach Seminarblock'), h('p', {class: 'small'}, 'Stand: ' + KD.STAND + '. Tippe ein Haus an, um es aufzuklappen.'), KD.HOUSES.map(houseText)]); }
+    if (ui.bib === 'inhalte') { KD.add(body, [h('h2', null, 'Inhalte nach Seminarblock'), KD.HOUSES.map(houseText)]); }
     if (ui.bib === 'prompts') {
       KD.add(body, [h('h2', null, 'Promptsammlung'), KD.PROMPT_GRUPPEN.map(function (g, gi) { return h('section', null, h('h3', null, g), h('div', {class: 'pgrid'}, KD.PROMPTS.filter(function (p) { return p.g === gi; }).map(promptCard))); })]);
     }
     if (ui.bib === 'glossar') { KD.add(body, [h('h2', null, 'Glossar'), h('dl', {class: 'terms'}, KD.GLOSSAR.map(function (g) { return [h('dt', null, g[0]), h('dd', null, g[1], ' ', link('#haus/' + g[2], KD.BYID[g[2]].name, 'more'))]; }))]); }
     if (ui.bib === 'quellen') {
-      KD.add(body, [h('h2', null, 'Quellen'), h('p', {class: 'small'}, 'Alle Quellen zuletzt geprüft am ' + KD.ABRUF + '. Links brauchen Internet und öffnen in einem neuen Tab.'),
+      KD.add(body, [h('h2', null, 'Quellen'), h('p', {class: 'small'}, 'Geprüft am ' + KD.ABRUF),
         h('h3', null, 'Zu den Inhalten'), Object.keys(KD.SRC).map(function (k) { return h('article', {class: 'srccard'}, h('h4', null, KD.SRC[k].kurz), srcDetail(k)); }),
         h('h3', null, 'Zur Gestaltung des Spiels'), h('p', {class: 'small'}, 'Für diese Arbeiten ist die Existenz über das DOI-Register bestätigt. Die Volltexte wurden für dieses Spiel nicht erneut gelesen.'),
         h('ul', {class: 'lit'}, KD.SRC_LERN.map(function (q) { return h('li', null, q[0], ' ', link(q[1], q[1], 'ext', {target: '_blank', rel: 'noopener noreferrer'}), h('br'), h('span', {class: 'small'}, 'Wofür: ' + q[2])); }))]);

@@ -34,7 +34,7 @@ KD.SRC = {
   weber: {kurz: 'Weber-Wulff et al. 2023', titel: 'Testing of detection tools for AI-generated text', hg: 'Weber-Wulff, Anohina-Naumeca, Bjelobaba, Foltýnek et al., International Journal for Educational Integrity 19(1)', stand: '2023', url: 'https://doi.org/10.1007/s40979-023-00146-z', st: 'r', notiz: ''},
   liang: {kurz: 'Liang et al. 2023', titel: 'GPT detectors are biased against non-native English writers', hg: 'Liang, Yuksekgonul, Mao, Wu, Zou, Patterns 4(7)', stand: '2023', url: 'https://doi.org/10.1016/j.patter.2023.100779', st: 'r', notiz: ''},
   erf: {kurz: 'Erfahrungswissen', titel: 'Erfahrungswissen aus der Seminarpraxis', hg: 'Aisha Gstöttner', stand: KD.STAND, url: '', st: 'e', notiz: 'Kein Forschungsbeleg. Probier es an deiner eigenen Aufgabe aus.'},
-  anbieter: {kurz: 'Anbieterseite prüfen', titel: 'Hilfeseiten deines Anbieters', hg: 'Anthropic (Claude), OpenAI (ChatGPT)', stand: 'ändert sich laufend', url: '', st: 'e', notiz: 'Namen, Tarife und Grenzen ändern sich. Für Claude haben wir die Angaben am ' + KD.ABRUF + ' geprüft. Für ChatGPT haben wir keine Einzelangaben geprüft: Sieh auf help.openai.com nach.'}
+  anbieter: {kurz: 'Anbieterseite prüfen', titel: 'Hilfeseiten deines Anbieters', hg: 'Anthropic (Claude), OpenAI (ChatGPT)', stand: 'Claude geprüft am ' + KD.ABRUF, url: '', st: 'e', notiz: 'Claude: support.anthropic.com. ChatGPT: help.openai.com.'}
 };
 KD.SRC_STATUS = {o: 'geprüft am Original', z: 'geprüft an Zweitquelle', r: 'Existenz im DOI-Register bestätigt', e: 'ohne Beleg, selbst prüfen'};
 
@@ -67,11 +67,7 @@ KD.IMPRESSUM = {
   zweck: 'Das KI-Dorf ist ein Begleitspiel zum KI-Seminar. Es ist kostenlos und enthält keine Werbung.',
   hinweise: [
     'Alle Beispiele in den Aufgaben sind erfunden.',
-    'Angaben zu Tools haben den Stand ' + KD.STAND + ' und ändern sich. Für Claude wurden sie am ' + KD.ABRUF + ' an den Seiten des Anbieters geprüft, für andere Tools nicht einzeln.',
-    'Das Dorf ist keine Rechtsberatung und ersetzt keine interne Vorgabe.',
-    'Die Prompts der Promptsammlung sind auf Aufbau, Platzhalter und Datenschutz geprüft, aber in keinem KI-Tool getestet. Die Beschreibungen typischer Ergebnisse sind keine echten Läufe.',
-    'Checklisten, Vorlagen und Regeln senken Risiken, schließen sie aber nicht aus. Ob ein Tool sich daran hält, prüfst du an echten Aufgaben.',
-    'Welche Funktionen du nutzen kannst, hängt von Tool, Tarif und der Freigabe deiner Organisation ab.'
+    'Die Prompts der Promptsammlung sind auf Aufbau, Platzhalter und Datenschutz geprüft, aber in keinem KI-Tool getestet. Die Beschreibungen typischer Ergebnisse sind keine echten Läufe.'
   ],
   daten: [
     'Das Dorf sendet nichts und kennt keine Konten. Es speichert nur in diesem Browser: Lernstand, Einstellungen, angehakte Checklisten, gesammelte Tipps und die Wörter der Wordcloud. Keine Namen, keine Antworttexte.',

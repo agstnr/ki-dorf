@@ -77,7 +77,7 @@ KD.HOUSES = [
     {k: 'Wenn doch etwas passiert', v: 'Falsches eingegeben? Nach der internen Regel melden, zum Beispiel an die Datenschutzbeauftragten. Den Chat zu löschen ersetzt die Meldung nicht.', ic: 'glocke', src: ['dsgvo33']}
   ],
   tasks: [
-    {type: 'sim', sim: 'reise', title: 'Reise einer Eingabe', intro: 'Folge einem Satz vom Gerät zum Anbieter und zurück. Leg die Schalter um und sieh, was sich ändert.'},
+    {type: 'sim', sim: 'reise', title: 'Reise einer Eingabe', intro: 'Verfolge eine Eingabe in Claude. Leg die Schalter um und sieh, was sich ändert.'},
     {type: 'sort', title: 'Die Ampel', cats: ['Grün: darf hinein', 'Gelb: nur anonymisiert', 'Rot: nie'], colors: ['g', 'y', 'r'], hint: 'Frag dich: Ist eine Person erkennbar? Ist es vertraulich oder schon öffentlich?',
       items: [
         {q: 'Eine veröffentlichte Pressemitteilung deiner Organisation, die du kürzen willst.', a: 0, why: 'Der Text ist bereits öffentlich.'},
@@ -95,7 +95,7 @@ KD.HOUSES = [
           {t: 'Nach der internen Regel melden, zum Beispiel an die Datenschutzbeauftragten.', ok: true, fb: 'Wer meldet, gibt der Organisation die Chance zu reagieren. Für sie läuft eine Frist gegenüber der Behörde.'},
           {t: 'Abwarten, ob etwas passiert.', ok: false, fb: 'Abwarten nimmt der Organisation die Zeit, die sie zum Reagieren hat.'}]},
         {t: 'Die Datenschutzbeauftragte fragt, ob deine Chats beim Anbieter zum Training verwendet werden dürfen. Wo siehst du nach?', opts: [
-          {t: 'In den Datenschutz-Einstellungen des Tools.', ok: true, fb: 'Dort steht der Schalter. Bei Team- und Enterprise-Tarifen gelten die Bedingungen der Organisation.'},
+          {t: 'In den Datenschutz-Einstellungen des Tools.', ok: true, fb: 'Bei Free, Pro und Max findest du dort den Schalter.'},
           {t: 'Das lässt sich nicht herausfinden.', ok: false, fb: 'Doch. Die Einstellung findest du in den Datenschutz-Einstellungen deines Kontos.'},
           {t: 'Im Chatverlauf.', ok: false, fb: 'Im Verlauf siehst du deine Chats. Die Trainingseinstellung steht in den Datenschutz-Einstellungen.'}]},
         {t: 'Beim nächsten Mal willst du es besser machen. Was gibst du ein?', opts: [
@@ -106,7 +106,7 @@ KD.HOUSES = [
     {type: 'sort', title: 'Wahr oder falsch?', intro: 'Aussagen zu Claude, geprüft an den Seiten des Anbieters.', cats: ['Wahr', 'Falsch'], hint: 'Denk an den Unterschied zwischen Löschen, Verlauf und Training.',
       items: [
         {q: 'Wenn ich die Trainingseinstellung ausschalte, werden meine bisherigen Chats gelöscht.', a: 1, why: 'Die Einstellung regelt nur die Nutzung zum Verbessern der Modelle. Löschen ist ein eigener Schritt.'},
-        {q: 'Die Trainingseinstellung gilt in allen Tarifen auf dieselbe Weise.', a: 1, why: 'Sie betrifft Free, Pro und Max. Für Team und Enterprise gelten eigene Bedingungen: Dort wird laut Anbieter standardmäßig nicht mit den Daten trainiert.'},
+        {q: 'Die Trainingseinstellung gilt in allen Tarifen auf dieselbe Weise.', a: 1, why: 'Sie betrifft Free, Pro und Max. Bei Team und Enterprise wird standardmäßig nicht mit den Daten trainiert.'},
         {q: 'Ein Inkognito-Chat wird nicht für das Training verwendet und landet nicht im Verlauf.', a: 0, why: 'Laut Anbieter stimmt beides. Aufbewahrt wird er trotzdem 30 Tage, in Organisationen je nach Einstellung auch länger.'},
         {q: 'Lösche ich einen Chat, verschwindet er sofort von allen Systemen des Anbieters.', a: 1, why: 'Aus dem Verlauf sofort, aus den Systemen im Hintergrund laut Anbieter innerhalb von 30 Tagen.'}
       ]}
@@ -117,7 +117,7 @@ KD.HOUSES = [
     checks: ['Ich kenne die internen Vorgaben meiner Organisation zu KI-Tools.', 'Ich habe nachgesehen, ob meine Chats zum Training verwendet werden dürfen, und die Einstellung bewusst gewählt.', 'Ich habe nachgesehen, ob mein Tool ein Memory hat und was darin steht.', 'Ich weiß, wie ich einen Chat ohne Verlauf starte, falls mein Tool das anbietet.', 'Ich weiß, wem ich einen Fehler melde.'],
     tplTitle: 'Anonymisieren vor dem Einfügen',
     tpl: 'Vor dem Einfügen ersetzen\n- Namen → Person A, Person B\n- Organisationen → Organisation X\n- Orte und Adressen → Ort 1\n- Geburtsdaten → Alter in Jahren oder weglassen\n- Kennnummern (Versicherung, Akte, Konto) → weglassen\n- Seltene Details, die jemanden erkennbar machen → verallgemeinern\n\nDanach prüfen: Könnte jemand, der den Fall kennt, die Person trotzdem erkennen? Wenn ja, weiter verallgemeinern oder weglassen.',
-    note: 'Diese Übersicht ist keine Rechtsberatung und ersetzt keine interne Vorgabe. Im Zweifel fragst du die Datenschutzbeauftragten und lässt die Daten weg.'
+    note: 'Bei Unsicherheit frag die Datenschutzbeauftragten und lass die Daten weg.'
   }
 },
 {
