@@ -41,7 +41,7 @@ function srcRow(keys) { return keys && keys.length ? h('div', {class: 'srcrow'},
 function srcDetail(key) {
   var q = KD.SRC[key];
   return [h('p', {class: 'srcstat src-' + q.st}, KD.icon(q.st === 'o' ? 'haken' : q.st === 'e' ? 'hilfe' : 'lupe'), ' ', KD.SRC_STATUS[q.st]),
-    h('dl', {class: 'kv'}, h('dt', null, 'Titel'), h('dd', null, q.titel), h('dt', null, 'Herausgeber'), h('dd', null, q.hg), h('dt', null, 'Stand'), h('dd', null, q.stand), h('dt', null, 'Geprüft am'), h('dd', null, KD.ABRUF)),
+    h('dl', {class: 'kv'}, h('dt', null, 'Titel'), h('dd', null, q.titel), h('dt', null, 'Herausgeber'), h('dd', null, q.hg)),
     q.notiz ? h('p', {class: 'small'}, q.notiz) : null,
     q.url ? h('p', null, link(q.url, [q.url, h('span', {class: 'sr'}, ' (öffnet in neuem Tab, braucht Internet)')], 'ext', {target: '_blank', rel: 'noopener noreferrer'})) : null];
 }
@@ -361,7 +361,7 @@ function houseText(x) {
     h('p', null, link('#haus/' + x.id, ['Zum Haus ', KD.icon('pfeil')], 'more')));
 }
 function viewBib() {
-  var tabs = [['inhalte', 'Inhalte'], ['prompts', 'Promptsammlung'], ['glossar', 'Glossar'], ['quellen', 'Quellen'], ['stand', 'Stand der Tool-Angaben']], body = h('div', {class: 'bibbody'}), nav = h('div', {class: 'pills', role: 'group', 'aria-label': 'Bereiche der Bibliothek'});
+  var tabs = [['inhalte', 'Inhalte'], ['prompts', 'Promptsammlung'], ['glossar', 'Glossar'], ['quellen', 'Quellen'], ['stand', 'Claude-Funktionen']], body = h('div', {class: 'bibbody'}), nav = h('div', {class: 'pills', role: 'group', 'aria-label': 'Bereiche der Bibliothek'});
   var inp = h('input', {type: 'search', id: 'bibq', placeholder: 'Suchen …', autocomplete: 'off'}), count = h('p', {class: 'small', role: 'status'});
   inp.value = ui.q;
   function hit(str) { return !ui.q || str.toLowerCase().indexOf(ui.q.toLowerCase()) >= 0; }
@@ -375,13 +375,13 @@ function viewBib() {
     }
     if (ui.bib === 'glossar') { KD.add(body, [h('h2', null, 'Glossar'), h('dl', {class: 'terms'}, KD.GLOSSAR.map(function (g) { return [h('dt', null, g[0]), h('dd', null, g[1], ' ', link('#haus/' + g[2], KD.BYID[g[2]].name, 'more'))]; }))]); }
     if (ui.bib === 'quellen') {
-      KD.add(body, [h('h2', null, 'Quellen'), h('p', {class: 'small'}, 'Geprüft am ' + KD.ABRUF),
+      KD.add(body, [h('h2', null, 'Quellen'),
         h('h3', null, 'Zu den Inhalten'), Object.keys(KD.SRC).map(function (k) { return h('article', {class: 'srccard'}, h('h4', null, KD.SRC[k].kurz), srcDetail(k)); }),
         h('h3', null, 'Zur Gestaltung des Spiels'), h('p', {class: 'small'}, 'Für diese Arbeiten ist die Existenz über das DOI-Register bestätigt. Die Volltexte wurden für dieses Spiel nicht erneut gelesen.'),
         h('ul', {class: 'lit'}, KD.SRC_LERN.map(function (q) { return h('li', null, q[0], ' ', link(q[1], q[1], 'ext', {target: '_blank', rel: 'noopener noreferrer'}), h('br'), h('span', {class: 'small'}, 'Wofür: ' + q[2])); }))]);
     }
     if (ui.bib === 'stand') {
-      KD.add(body, [h('h2', null, 'Stand der Tool-Angaben'), h('div', {class: 'tablewrap'}, h('table', {class: 'tbl'}, h('thead', null, h('tr', null, h('th', {scope: 'col'}, 'Funktion in Claude'), h('th', {scope: 'col'}, 'Verfügbar'), h('th', {scope: 'col'}, 'Quelle'))), h('tbody', null, KD.TOOLSTAND.map(function (r) { return h('tr', null, h('th', {scope: 'row'}, r[0]), h('td', null, r[1]), h('td', null, srcBadge(r[2]))); }))))]);
+      KD.add(body, [h('h2', null, 'Claude-Funktionen'), h('div', {class: 'tablewrap'}, h('table', {class: 'tbl'}, h('thead', null, h('tr', null, h('th', {scope: 'col'}, 'Funktion in Claude'), h('th', {scope: 'col'}, 'Verfügbar'), h('th', {scope: 'col'}, 'Quelle'))), h('tbody', null, KD.TOOLSTAND.map(function (r) { return h('tr', null, h('th', {scope: 'row'}, r[0]), h('td', null, r[1]), h('td', null, srcBadge(r[2]))); }))))]);
     }
   }
   function search() {
@@ -475,5 +475,5 @@ KD.app = {
 
 S.load(); applySettings(); route();
 if (!D.seenHelp) { openHelp(null); }
-if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('sw.js').catch(function () { /* ohne Service Worker läuft alles, nur nicht offline aus dem Netz */ }); }
+if ('serviceWorker' in navigator && location.protocol === 'https:') { navigator.serviceWorker.register('sw.js', {updateViaCache: 'none'}).catch(function () { /* ohne Service Worker läuft alles, nur nicht offline aus dem Netz */ }); }
 })();

@@ -77,7 +77,7 @@ KD.HOUSES = [
     {k: 'Wenn doch etwas passiert', v: 'Falsches eingegeben? Nach der internen Regel melden, zum Beispiel an die Datenschutzbeauftragten. Den Chat zu löschen ersetzt die Meldung nicht.', ic: 'glocke', src: ['dsgvo33']}
   ],
   tasks: [
-    {type: 'sim', sim: 'reise', title: 'Reise einer Eingabe', intro: 'Verfolge eine Eingabe in Claude. Leg die Schalter um und sieh, was sich ändert.'},
+    {type: 'sim', sim: 'reise', title: 'Reise einer Eingabe in Claude'},
     {type: 'sort', title: 'Die Ampel', cats: ['Grün: darf hinein', 'Gelb: nur anonymisiert', 'Rot: nie'], colors: ['g', 'y', 'r'], hint: 'Frag dich: Ist eine Person erkennbar? Ist es vertraulich oder schon öffentlich?',
       items: [
         {q: 'Eine veröffentlichte Pressemitteilung deiner Organisation, die du kürzen willst.', a: 0, why: 'Der Text ist bereits öffentlich.'},
@@ -103,11 +103,11 @@ KD.HOUSES = [
           {t: 'Denselben Text wie vorher, aber in einem Inkognito-Chat.', ok: false, fb: 'Ein Inkognito-Chat landet nicht im Verlauf. Beim Anbieter liegen die Daten trotzdem. Das löst das Problem nicht.'},
           {t: 'Nur den Vornamen und die Diagnose.', ok: false, fb: 'Vorname plus Diagnose kann in einer kleinen Einrichtung reichen, um jemanden zu erkennen.'}]}
       ]},
-    {type: 'sort', title: 'Wahr oder falsch?', intro: 'Aussagen zu Claude, geprüft an den Seiten des Anbieters.', cats: ['Wahr', 'Falsch'], hint: 'Denk an den Unterschied zwischen Löschen, Verlauf und Training.',
+    {type: 'sort', title: 'Wahr oder falsch?', intro: 'Die Aussagen beziehen sich auf Claude.', cats: ['Wahr', 'Falsch'], hint: 'Denk an den Unterschied zwischen Löschen, Verlauf und Training.',
       items: [
         {q: 'Wenn ich die Trainingseinstellung ausschalte, werden meine bisherigen Chats gelöscht.', a: 1, why: 'Die Einstellung regelt nur die Nutzung zum Verbessern der Modelle. Löschen ist ein eigener Schritt.'},
         {q: 'Die Trainingseinstellung gilt in allen Tarifen auf dieselbe Weise.', a: 1, why: 'Sie betrifft Free, Pro und Max. Bei Team und Enterprise wird standardmäßig nicht mit den Daten trainiert.'},
-        {q: 'Ein Inkognito-Chat wird nicht für das Training verwendet und landet nicht im Verlauf.', a: 0, why: 'Laut Anbieter stimmt beides. Aufbewahrt wird er trotzdem 30 Tage, in Organisationen je nach Einstellung auch länger.'},
+        {q: 'Ein Inkognito-Chat wird nicht für das Training verwendet und landet nicht im Verlauf.', a: 0, why: 'Claude bewahrt den Chat 30 Tage auf, in Organisationen je nach Einstellung auch länger.'},
         {q: 'Lösche ich einen Chat, verschwindet er sofort von allen Systemen des Anbieters.', a: 1, why: 'Aus dem Verlauf sofort, aus den Systemen im Hintergrund laut Anbieter innerhalb von 30 Tagen.'}
       ]}
   ],
