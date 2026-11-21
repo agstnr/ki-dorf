@@ -68,7 +68,7 @@ function helpBody() {
     ['Reihenfolge ändern', 'Pfeilknöpfe neben der Zeile', 'Pfeilknöpfe', 'Pfeilknöpfe'],
     ['Dialog schließen', 'Escape', 'Kreuz oben rechts', 'Kreuz oder neben den Dialog klicken'],
     ['Vollbild im 3D-Dorf', 'F', 'Knopf „Vollbild“', 'Knopf „Vollbild“']];
-  var tut = ['Jedes Haus ist ein Block aus dem Seminar. Such dir eines auf der Karte aus oder lauf hin.', 'Im Haus: Einstiegsfrage, ein paar Karten zum Lesen, dann Aufgaben. Nichts ist gesperrt.', 'Beim ersten Fehlversuch bekommst du einen Hinweis, beim zweiten die Auflösung mit Begründung. Es gibt keine Uhr und keine Punkteabzüge.', 'Im Briefkasten auf dem Dorfplatz liegt die Dorfrunde: fünf Karten zum Wiederholen. Alles zum Nachlesen steht in der Bibliothek.'];
+  var tut = ['Jedes Haus ist ein Block aus dem Seminar. Such dir eines auf der Karte aus oder lauf hin.', 'Im Haus: Einstiegsfrage, ein paar Karten zum Lesen, dann Aufgaben. Nichts ist gesperrt.', 'Beim ersten Fehlversuch bekommst du einen Hinweis, beim zweiten die Auflösung mit Begründung. Es gibt keine Uhr und keine Punkte.', 'Im Briefkasten auf dem Dorfplatz liegt die Dorfrunde: fünf Karten zum Wiederholen. Alles zum Nachlesen steht in der Bibliothek.'];
   return [h('h3', null, 'So geht es'), h('ol', {class: 'tut'}, tut.map(function (t) { return h('li', null, t); })),
     h('h3', null, 'Steuerung'),
     h('div', {class: 'tablewrap'}, h('table', {class: 'tbl'}, h('thead', null, h('tr', null, ['Was', 'Tastatur', 'Finger', 'Maus'].map(function (x) { return h('th', {scope: 'col'}, x); }))),
@@ -143,7 +143,7 @@ function viewDorf() {
   if (threeD) { world = h('div', {id: 'worldSlot'}); }
   var kids = [
     h('h1', {id: 'top', tabindex: '-1'}, 'KI-Dorf'),
-    h('p', {class: 'lede'}, 'Begleitspiel zum KI-Seminar. Jedes Haus ist ein Seminarblock: Einstiegsfrage, ein paar Karten, Aufgaben. Mit jeder gelösten Aufgabe wächst das Haus.'),
+    h('p', {class: 'lede'}, 'Begleitspiel zum KI-Seminar.'),
     h('div', {class: 'progress'}, bar(t.core, 'Fortschritt in den Seminarhäusern'), h('p', null, t.done + ' von ' + t.n + ' Seminarhäusern eingerichtet'),
       next ? link('#haus/' + next.id, ['Weiter: ', next.name, ' ', KD.icon('pfeil')], 'btn') : h('p', {class: 'okline'}, KD.icon('haken'), ' Alle Seminarhäuser stehen.')),
     threeD ? h('section', {class: 'worldwrap', 'aria-label': '3D-Dorf'}, world) : null,
@@ -154,7 +154,7 @@ function viewDorf() {
         h('section', {class: 'panel tipday', 'aria-labelledby': 'tip-h'}, h('h2', {id: 'tip-h'}, 'Tipp des Tages'), h('div', {class: 'npcsay'}, tn ? npcFace(tn) : null, h('div', null, h('p', {class: 'tip'}, tip.t), h('p', {class: 'small'}, tn ? tn.name + ', ' + tn.beruf : ''), KD.BYID[tip.haus] ? link('#haus/' + tip.haus, 'Mehr dazu: ' + KD.BYID[tip.haus].name, 'more') : null))),
         h('section', {class: 'panel', 'aria-labelledby': 'rd-h'}, h('h2', {id: 'rd-h'}, 'Briefkasten: Dorfrunde'),
           due ? [h('p', null, 'Im Briefkasten ' + (due === 1 ? 'liegt eine Karte' : 'liegen ' + due + ' Karten') + ' zum Wiederholen.'), link('#runde', ['Dorfrunde starten ', KD.icon('pfeil')], 'btn')]
-            : S.roundCards(1).length ? [h('p', {class: 'small'}, 'Heute ist nichts fällig. Morgen liegen wieder Karten hier. Du kannst trotzdem eine Runde drehen.'), link('#runde', 'Trotzdem eine Runde', 'btn ghost')]
+            : S.roundCards(1).length ? [h('p', {class: 'small'}, 'Heute ist nichts fällig. Morgen liegen wieder Karten hier.'), link('#runde', 'Trotzdem eine Runde', 'btn ghost')]
             : h('p', {class: 'small'}, 'Noch leer. Sobald du in einem Haus Aufgaben gelöst hast, liegen hier Karten zum Wiederholen.')),
         h('section', {class: 'panel', 'aria-labelledby': 'npc-h'}, h('h2', {id: 'npc-h'}, 'Wer hier wohnt'), h('ul', {class: 'npclist'}, KD.NPCS.map(function (n) { return h('li', null, btn('npcbtn', [npcFace(n), h('span', null, h('strong', null, n.name), h('small', null, n.beruf))], function (e) { openNpc(n.id, e.currentTarget); })); })))))
   ];
@@ -229,20 +229,19 @@ function stageHead(el, tag, title) { KD.add(el, [h('p', {class: 'eyebrow'}, tag)
 
 function stepQ(x, el, api) {
   var q = x.q0, st = S.hs(x.id), out = h('div', {class: 'fbwrap', role: 'status'}), opts = h('div', {class: 'choices col'});
-  stageHead(el, 'Einstiegsfrage · zählt nicht', q.q);
+  stageHead(el, 'Ohne Wertung', q.q);
   function reveal(i) {
     Array.prototype.forEach.call(opts.children, function (b, k) { b.disabled = true; if (k === q.a) { b.classList.add('is-right'); } else if (k === i) { b.classList.add('is-wrong'); } });
     KD.clear(out);
-    KD.add(out, [h('p', {class: 'fb fb-' + (q.a < 0 || i === q.a ? 'ok' : 'solved')}, KD.icon(q.a < 0 || i === q.a ? 'haken' : 'pfeil'), h('strong', null, q.a < 0 ? 'Notiert. ' : i === q.a ? 'Gut geschätzt. ' : 'Knapp daneben, und genau dafür ist die Frage da. '), q.why), btn('btn next-action', ['Weiter zum Fundament ', KD.icon('pfeil')], api.next)]);
+    KD.add(out, [h('p', {class: 'fb fb-' + (q.a < 0 || i === q.a ? 'ok' : 'solved')}, KD.icon(q.a < 0 || i === q.a ? 'haken' : 'pfeil'), q.why), btn('btn next-action', ['Weiter zum Fundament ', KD.icon('pfeil')], api.next)]);
     if (!st.q) { st.q = 1; S.save(); api.refresh(); }
   }
   q.opts.forEach(function (o, i) { opts.appendChild(btn('choice', o, function () { reveal(i); out.querySelector('.btn').focus(); })); });
-  KD.add(el, [h('p', {class: 'small'}, 'Schätz einfach. Eine Frage vor dem Lesen hilft beim Behalten, auch wenn die Antwort danebenliegt.'), opts, out]);
-  if (st.q) { KD.add(out, [h('p', {class: 'small'}, 'Schon beantwortet. Du kannst noch einmal wählen.')]); }
+  KD.add(el, [opts, out]);
 }
 function stepF(x, el, api) {
   var st = S.hs(x.id), n = x.cards.length, i = Math.min(ui.card[x.id] || 0, n - 1), box = h('div', {class: 'deck'}), nav = h('div', {class: 'decknav'}), dots = h('ol', {class: 'dots', 'aria-label': 'Karten'});
-  stageHead(el, 'Fundament', x.platz ? 'Willkommen im Dorf' : 'Das Wichtigste in ' + n + ' Karten');
+  el.appendChild(h('h2', {id: 'stage-h', tabindex: '-1'}, x.platz ? 'Willkommen im Dorf' : 'Fundament'));
   function draw(focus) {
     var c = x.cards[i]; ui.card[x.id] = i;
     KD.clear(box);
@@ -260,7 +259,7 @@ function stepF(x, el, api) {
 }
 function stepT(x, el, api) {
   var ti = Math.min(ui.task[x.id] === undefined ? firstOpen(x) : ui.task[x.id], x.tasks.length - 1), pills = h('div', {class: 'pills', role: 'group', 'aria-label': 'Aufgaben'}), body = h('div', {class: 'taskbody'});
-  stageHead(el, 'Aufgaben', x.tasks.length + ' Aufgaben, in beliebiger Reihenfolge');
+  el.appendChild(h('h2', {id: 'stage-h', tabindex: '-1'}, 'Aufgaben'));
   function firstOpen(hh) { for (var k = 0; k < hh.tasks.length; k++) { if (!S.taskDone(hh, k)) { return k; } } return 0; }
   function drawPills() {
     KD.clear(pills);
@@ -269,7 +268,7 @@ function stepT(x, el, api) {
   function draw(focus) {
     var t = x.tasks[ti]; ui.task[x.id] = ti; drawPills(); KD.clear(body);
     var after = h('div', {class: 'after', role: 'status'});
-    KD.add(body, [h('p', {class: 'eyebrow'}, KD.T.name(t)), h('h3', {id: 'task-h', tabindex: '-1'}, t.title), h('p', {class: 'lead'}, t.intro)]);
+    KD.add(body, [h('h3', {class: 'sr', id: 'task-h', tabindex: '-1'}, t.title), t.intro ? h('p', {class: 'lead'}, t.intro) : null]);
     var root = h('div', {class: 'task task-' + t.type}); body.appendChild(root); body.appendChild(after);
     var rendering = true;
     function showNext() {
@@ -282,7 +281,6 @@ function stepT(x, el, api) {
       var next = nx >= 0 && nx !== ti
         ? btn('btn next-action', ['Nächste Aufgabe: ' + x.tasks[nx].title + ' ', KD.icon('pfeil')], function () { ti = nx; draw(true); })
         : btn('btn next-action', ['Zur Einrichtung ', KD.icon('pfeil')], api.next);
-      if (nx < 0) { after.appendChild(h('p', {class: 'okline'}, KD.icon('haken'), ' Alle Aufgaben in diesem Haus sind gelöst.')); }
       after.appendChild(next);
       if (!rendering) { next.focus(); }
     }
@@ -298,9 +296,9 @@ function stepT(x, el, api) {
 function stepE(x, el, api) {
   var e = x.einr, st = S.hs(x.id), msg = h('p', {class: 'small', role: 'status'}), pre = h('pre', {id: 'tpl'}, e.tpl);
   stageHead(el, x.platz ? 'Fahrplan' : 'Einrichtung', e.title);
-  KD.add(el, [h('p', {class: 'small'}, x.platz ? '' : 'Das hier nimmst du mit in dein eigenes Tool. Die Checkliste ist für dich und sperrt nichts.'),
+  KD.add(el, [
     h('div', {class: 'tplhead'}, h('h3', null, e.tplTitle), btn('btn ghost', [KD.icon('kopie'), ' Text kopieren'], function () { KD.copy(e.tpl, msg, 'Kopiert.'); })), pre, msg,
-    h('fieldset', {class: 'checks'}, h('legend', null, e.checkTitle), e.checks.map(function (c, i) { var inp = h('input', {type: 'checkbox', onchange: function () { if (inp.checked) { st.c[i] = 1; } else { delete st.c[i]; } S.save(); }}); inp.checked = !!st.c[i]; return h('label', {class: 'chk'}, inp, h('span', null, c)); })),
+    h('fieldset', {class: 'checks'}, h('legend', null, 'Freiwillig: ' + e.checkTitle), e.checks.map(function (c, i) { var inp = h('input', {type: 'checkbox', onchange: function () { if (inp.checked) { st.c[i] = 1; } else { delete st.c[i]; } S.save(); }}); inp.checked = !!st.c[i]; return h('label', {class: 'chk'}, inp, h('span', null, c)); })),
     e.link ? h('div', {class: 'extbox'}, h('h3', null, 'Feedback an die Seminarleitung'), h('p', null, 'Das Feedback-Formular liegt bei Google Forms. Wenn du es öffnest, verlässt du das Dorf, und deine Angaben gehen an Google. Bitte keine Namen eintragen. Ohne Internet nutzt du die Vorlage oben.'), link(FEEDBACK_URL, ['Formular bei Google öffnen', h('span', {class: 'sr'}, ' (öffnet in neuem Tab)')], 'btn ghost ext', {target: '_blank', rel: 'noopener noreferrer'})) : null,
     h('div', {class: 'after'}, x.platz ? btn('btn next-action', ['Zur Wordcloud ', KD.icon('pfeil')], api.next)
       : link('#dorf', ['Zurück ins Dorf ', KD.icon('pfeil')], 'btn next-action'))]);
@@ -326,7 +324,7 @@ function stepW(x, el) {
 function viewRunde() {
   var cards = S.roundCards(5), i = 0, right = 0, box = h('div', {class: 'stage'});
   KD.clear(app);
-  KD.add(app, [link('#dorf', [KD.icon('pfeill'), ' Zurück ins Dorf'], 'back'), h('h1', {id: 'top', tabindex: '-1'}, 'Dorfrunde'), h('p', {class: 'lede'}, 'Fünf Karten aus Häusern, die du schon besucht hast. Wackeliges und lange nicht Gesehenes kommt zuerst. Keine Uhr, keine Punkte.'), box]);
+  KD.add(app, [link('#dorf', [KD.icon('pfeill'), ' Zurück ins Dorf'], 'back'), h('h1', {id: 'top', tabindex: '-1'}, 'Dorfrunde'), h('p', {class: 'lede'}, 'Fünf Karten aus Häusern, die du schon besucht hast. Wackeliges und lange nicht Gesehenes kommt zuerst.'), box]);
   if (KD.World) { KD.World.detach(); }
   if (!cards.length) { KD.add(box, [h('p', null, 'Der Briefkasten ist leer. Lös zuerst Aufgaben in einem Haus.')]); return; }
   function show() {

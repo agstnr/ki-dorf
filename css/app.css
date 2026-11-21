@@ -164,6 +164,7 @@ p{margin:0} ul,ol{margin:0;padding-left:1.3em} a{color:var(--accent)}
 .pill{font:800 .9em var(--body);display:inline-flex;gap:6px;align-items:center;min-height:44px;padding:6px 12px;border-radius:12px;border:2px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
 .pill small{color:var(--ink-soft)} .pill.done{border-color:var(--ok)} .pill.done .ic{color:var(--ok)}
 .pill[aria-current="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)} .pill[aria-current="true"] small,.pill[aria-current="true"] .ic{color:var(--panel)}
+.pair-number{display:inline-block;margin-inline-end:.5em;padding-inline:.35em;border:1px solid currentColor;border-radius:4px}
 .taskbody,.task,.after{display:grid;gap:12px;min-width:0;justify-items:start} .task>*{width:100%}
 .cards,.binlist{list-style:none;padding:0;display:grid;gap:8px}
 .card{font:700 1em/1.4 var(--body);width:100%;text-align:left;display:grid;gap:4px;padding:12px 14px;border-radius:12px;border:2px solid var(--ink);background:var(--panel);color:var(--ink);cursor:grab;touch-action:none;box-shadow:3px 3px 0 var(--hair)}

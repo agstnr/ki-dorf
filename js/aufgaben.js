@@ -38,7 +38,7 @@ T.sort = function (root, t, ctx) {
   function settle(x, ci, kind) {
     var cid = ctx.hid + '.' + ctx.ti + '.' + x.i;
     if (x.el.parentNode) { x.el.parentNode.removeChild(x.el); }
-    bins[ci].list.appendChild(h('li', {class: 'placed placed-' + kind}, h('span', {class: 'ptext'}, x.it.q), fb(kind === 'ok' ? 'ok' : 'solved', (kind === 'ok' ? '' : 'Gehört zu „' + t.cats[ci] + '“. ') + x.it.why)));
+    bins[ci].list.appendChild(h('li', {class: 'placed placed-' + kind}, h('span', {class: 'ptext'}, x.it.q), fb(kind === 'ok' ? 'ok' : 'solved', x.it.why)));
     x.done = true; sel = null;
     if (kind !== 'old') { finish(ctx, cid, kind === 'ok' && x.tries === 0); }
     var left = order.filter(function (o) { return !o.done; });
@@ -81,8 +81,8 @@ T.sort = function (root, t, ctx) {
     else { stack.appendChild(cardEl(x)); }
   });
   var open = order.filter(function (o) { return !o.done; }).length;
-  status.textContent = open ? (open === 1 ? 'Eine Karte.' : open + ' Karten, eine nach der anderen.') : 'Alle Karten zugeordnet.';
-  KD.add(root, [stack, status, binRow]);
+  if (!open) { status.textContent = 'Alle Karten zugeordnet.'; }
+  KD.add(root, [open ? h('p', {class: 'small'}, 'Erst Karte, dann Ziel wählen.') : null, stack, status, binRow]);
 };
 
 /* ---------- Finde den Fehler: Stellen markieren ---------- */
@@ -98,7 +98,8 @@ T.mark = function (root, t, ctx) {
   });
   function lock(r, quiet) {
     r.lock = true; r.btn.setAttribute('aria-pressed', r.it.bad ? 'true' : 'false'); r.btn.setAttribute('aria-disabled', 'true'); r.btn.classList.add(r.it.bad ? 'is-bad' : 'is-fine');
-    KD.clear(r.note).appendChild(fb(quiet || r.first ? 'ok' : 'solved', (r.it.bad ? t.label + ': ' : 'In Ordnung: ') + r.it.why));
+    if (r.it.why) { KD.clear(r.note).appendChild(fb(quiet || r.first ? 'ok' : 'solved', (r.it.bad ? t.label + ': ' : 'In Ordnung: ') + r.it.why)); }
+    else { KD.add(r.btn, [KD.icon('haken'), h('span', {class: 'sr'}, ', in Ordnung')]); }
   }
   function check() {
     round += 1;
@@ -119,7 +120,7 @@ function markOne(root, t, ctx) {
     tries += 1; if (tries >= 2) { end(false); return; }
     KD.clear(out).appendChild(fb('hint', t.hint || 'Lies den Satz noch einmal.'));
   }
-  function end(first) { KD.clear(out).appendChild(fb(first ? 'ok' : 'solved', (it.bad ? t.label + ': ' : 'In Ordnung: ') + it.why)); row.hidden = true; finish(ctx, cid, first); if (ctx.onAll) { ctx.onAll(); } }
+  function end(first) { KD.clear(out).appendChild(fb(first ? 'ok' : 'solved', it.why ? (it.bad ? t.label + ': ' : 'In Ordnung: ') + it.why : 'Der Satz ist in Ordnung.')); row.hidden = true; finish(ctx, cid, first); if (ctx.onAll) { ctx.onAll(); } }
   row.appendChild(btn('choice', 'Ja, ' + t.label), null); row.lastChild.addEventListener('click', function () { ans(true); });
   row.appendChild(btn('choice', 'Nein, in Ordnung'), null); row.lastChild.addEventListener('click', function () { ans(false); });
   KD.add(root, [h('p', {class: 'quote'}, it.t), h('p', {class: 'small'}, 'Ist das ' + t.label + '?'), row, out]);
@@ -183,7 +184,7 @@ T.order = function (root, t, ctx) {
   function end(first) { locked = true; go.hidden = true; draw(); out.appendChild(fb(first ? 'ok' : 'solved', t.why)); finish(ctx, cid, first); if (ctx.onAll) { ctx.onAll(); } }
   if (locked) { go.hidden = true; out.appendChild(fb('ok', t.why)); }
   draw();
-  KD.add(root, [list, go, out]);
+  KD.add(root, [locked ? null : h('p', {class: 'small'}, 'Sortiere die Schritte mit den Pfeiltasten neben der Liste.'), list, go, out]);
 };
 
 /* ---------- Lückentext: Wort wählen, Lücke antippen ---------- */
@@ -221,14 +222,14 @@ T.cloze = function (root, t, ctx) {
   }
   function end(first) { locked = true; go.hidden = true; t.blanks.forEach(function (w, n) { setBlank(n, {w: w}); blanks[n].classList.add('is-fine'); }); KD.clear(pool); out.appendChild(fb(first ? 'ok' : 'solved', t.why)); finish(ctx, cid, first); if (ctx.onAll) { ctx.onAll(); } }
   if (locked) { t.blanks.forEach(function (w, n) { setBlank(n, {w: w}); blanks[n].classList.add('is-fine'); }); go.hidden = true; out.appendChild(fb('ok', t.why)); } else { drawPool(); }
-  KD.add(root, [para, pool, go, out]);
+  KD.add(root, [locked ? null : h('p', {class: 'small'}, 'Erst Wort, dann Lücke wählen.'), para, pool, go, out]);
 };
 
 /* ---------- Paare finden: Begriff und Erklärung, in kleinen Runden ---------- */
 T.pairs = function (root, t, ctx) {
   var cid = ctx.hid + '.' + ctx.ti + '.x', errors = 0, wrap = h('div'), done = isDone(ctx, cid);
   var rounds = [], per = 5; for (var i = 0; i < t.pairs.length; i += per) { rounds.push({name: 'Runde ' + (rounds.length + 1), list: t.pairs.slice(i, i + per)}); }
-  var nPflicht = rounds.length; if (t.bonus && t.bonus.length) { rounds.push({name: 'Bonusrunde (freiwillig)', list: t.bonus, bonus: true}); }
+  var nPflicht = rounds.length; if (t.bonus && t.bonus.length) { rounds.push({name: 'Bonusrunde', list: t.bonus, bonus: true}); }
   function show(ri) {
     KD.clear(wrap);
     var R = rounds[ri], sel = null, left = h('div', {class: 'pcol'}), right = h('div', {class: 'pcol'}), out = h('div', {class: 'fbwrap', role: 'status'}), open = R.list.length;
@@ -248,18 +249,22 @@ T.pairs = function (root, t, ctx) {
     });
     function match(ti, defBtn, ok) {
       L[ti].disabled = true; defBtn.disabled = true; L[ti].classList.add('is-fine'); defBtn.classList.add('is-fine'); L[ti].setAttribute('aria-pressed', 'false');
-      KD.clear(out).appendChild(fb(ok ? 'ok' : 'solved', R.list[ti][0] + ': ' + R.list[ti][1] + '.')); sel = null; open -= 1;
+      var number = R.list.length - open + 1;
+      [L[ti], defBtn].forEach(function (b) {
+        b.prepend(h('span', {class: 'pair-number'}, h('span', {class: 'sr'}, 'Paar '), String(number)));
+      });
+      KD.clear(out).appendChild(fb(ok ? 'ok' : 'solved', 'Paar ' + number)); sel = null; open -= 1;
       if (!open) { roundDone(); } else { var nx = L.filter(function (x) { return !x.disabled; })[0]; if (nx) { nx.focus(); } }
     }
     function roundDone() {
       var last = ri + 1 >= rounds.length, nextBonus = !last && rounds[ri + 1].bonus;
       if (ri + 1 === nPflicht && !done) { done = true; finish(ctx, cid, errors === 0); if (ctx.onAll) { ctx.onAll(); } }
-      if (!last) { var nb = btn('btn' + (nextBonus ? ' ghost' : ' next-action'), nextBonus ? 'Bonusrunde spielen' : 'Weiter zu ' + rounds[ri + 1].name, function () { show(ri + 1); }); out.appendChild(nb); if (!nextBonus || ctx.round) { nb.focus(); } }
-      else { out.appendChild(fb('ok', 'Alle Paare gefunden.')); }
+      if (!last) { var nb = btn('btn' + (nextBonus ? ' ghost' : ' next-action'), nextBonus ? 'Bonusrunde spielen (freiwillig)' : 'Weiter zu ' + rounds[ri + 1].name, function () { show(ri + 1); }); out.appendChild(nb); if (!nextBonus || ctx.round) { nb.focus(); } }
+      else if (R.bonus) { say('Bonusrunde beendet.'); }
     }
     KD.add(wrap, [h('p', {class: 'scentag'}, R.name + ' · ' + R.list.length + ' Paare'), h('div', {class: 'pairs'}, left, right), out]);
   }
-  if (done) { wrap.appendChild(fb('ok', 'Pflichtrunden geschafft.')); wrap.appendChild(btn('btn ghost', 'Noch einmal spielen', function () { errors = 0; show(0); })); if (t.bonus) { wrap.appendChild(btn('btn ghost', 'Bonusrunde spielen', function () { show(rounds.length - 1); })); } }
+  if (done) { wrap.appendChild(fb('ok', 'Pflichtrunden geschafft.')); wrap.appendChild(btn('btn ghost', 'Noch einmal spielen', function () { errors = 0; show(0); })); if (t.bonus) { wrap.appendChild(btn('btn ghost', 'Bonusrunde spielen (freiwillig)', function () { show(rounds.length - 1); })); } }
   else { show(0); }
   root.appendChild(wrap);
 };
@@ -370,7 +375,7 @@ SIM.reise = function (root, t, ctx, cid, done) {
     }
     KD.clear(nav);
     KD.add(nav, [btn('btn ghost', [KD.icon('pfeill'), ' Zurück'], function () { st.i -= 1; draw(); nav.firstChild.focus(); }, {disabled: st.i === 0}),
-      st.i < N.length - 1 ? btn('btn next-action', ['Weiter ', KD.icon('pfeil')], function () { st.i += 1; draw(); nav.lastChild.focus(); }) : fb('ok', 'Reise beendet.')]);
+      st.i < N.length - 1 ? btn('btn next-action', ['Weiter ', KD.icon('pfeil')], function () { st.i += 1; draw(); var next = nav.querySelector('.next-action'); if (next) { next.focus(); } }) : null]);
     live.textContent = 'Station ' + (st.i + 1) + ': ' + N[st.i][0];
     if (st.i === N.length - 1 && !done) { done = true; finish(ctx, cid, true); if (ctx.onAll) { ctx.onAll(); } }
   }
