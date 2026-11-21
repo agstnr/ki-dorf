@@ -29,7 +29,7 @@ KD.HOUSES = [
 {
   id: 'fundamenthaus', slot: 1, name: 'Fundamenthaus', sub: 'Begriffe und Grundlagen', npc: 'ada', ic: 'bausteine',
   look: {wall: 'wall-5', roof: 'roof-1', roofType: 'gable', emblem: 'blocks', kind: 'school'},
-  q0: {q: 'Eine KI nennt dir ein Buch mit Verlag und Erscheinungsjahr. Was weißt du jetzt sicher?', opts: ['Das Buch gibt es, sonst könnte sie es nicht nennen.', 'Noch nichts. Die Angabe kann erfunden sein.', 'Das Buch gibt es, nur das Jahr könnte falsch sein.'], a: 1, why: 'Ein Sprachmodell setzt wahrscheinliche Wörter aneinander. Ob das Ergebnis stimmt, prüft es dabei nicht. Darum drehen sich die nächsten Karten.'},
+  q0: {q: 'Eine KI nennt dir ein Buch mit Verlag und Erscheinungsjahr. Was weißt du jetzt sicher?', opts: ['Das Buch gibt es, sonst könnte sie es nicht nennen.', 'Noch nichts. Die Angabe kann erfunden sein.', 'Das Buch gibt es, nur das Jahr könnte falsch sein.'], a: 1, why: 'Ein Sprachmodell setzt wahrscheinliche Wörter aneinander. Ob das Ergebnis stimmt, prüft es dabei nicht.'},
   cards: [
     {k: 'Sprachmodell', v: 'Ein Programm, das aus sehr vielen Texten gelernt hat, welches Wort wahrscheinlich als Nächstes kommt. Alltagsbild: eine sehr belesene Person, die jeden Satz flüssig fortsetzt und dabei nicht nachschlägt.', fig: 'wahrscheinlich', src: ['ji']},
     {k: 'Prompt und Kontext', v: 'Der Prompt ist dein Auftrag. Der Kontext ist alles, was das Modell dabei sieht: deine Nachricht, der Chat davor, Dateien, Projektanweisungen. Alltagsbild: der Zettel und die Mappe, die du einer Vertretung auf den Tisch legst.', ic: 'zettel'},
@@ -40,10 +40,10 @@ KD.HOUSES = [
     {k: 'Chatbot, Assistent, Agent', v: 'Ein Chatbot antwortet. Ein Assistent oder Agent nutzt zusätzlich Werkzeuge: Dateien öffnen, im Browser klicken, Termine lesen. Je mehr er darf, desto wichtiger sind klare Grenzen.', ic: 'roboter'}
   ],
   tasks: [
-    {type: 'pairs', title: 'Begriffe und Bilder', intro: 'Finde zu jedem Begriff die passende Erklärung. Die Bonusrunde ist freiwillig.',
+    {type: 'pairs', title: 'Begriffe und Bilder', intro: 'Finde zu jedem Begriff die passende Erklärung.',
       pairs: [['Sprachmodell', 'Setzt wahrscheinliche Wörter aneinander'], ['Prompt', 'Dein Auftrag an die KI'], ['Kontext', 'Alles, was das Modell beim Antworten sieht'], ['Token', 'Ein Wortstück, in dem Modelle rechnen'], ['Modell', 'Die Variante, die deine Antwort berechnet: schnell oder gründlich'], ['Projekt', 'Arbeitsbereich mit eigenen Anweisungen und Dateien'], ['Memory', 'Was sich das Tool über Chats hinweg merkt'], ['Skill', 'Gespeicherte Arbeitsanweisung für wiederkehrende Aufgaben'], ['Konnektor', 'Verbindung zwischen KI-Tool und einer App'], ['Plug-in', 'Paket aus Skills, Konnektoren und mehr']],
       bonus: [['Kontextfenster', 'Wie viel Text auf einmal Platz hat'], ['Halluzination', 'Klingt überzeugend, ist falsch'], ['Systemprompt', 'Grundanweisung, die vor deinem Auftrag gilt'], ['Agent', 'Erledigt mehrere Schritte mit Werkzeugen']]},
-    {type: 'sort', title: 'Was steckt dahinter?', intro: 'Ordne jede Situation dem passenden Begriff zu.', cats: ['Halluzination', 'Kontextfenster', 'Token', 'Agent'], hint: 'Frag dich: Ist etwas erfunden, ist etwas weggefallen, wird etwas gezählt oder handelt die KI selbst?',
+    {type: 'sort', title: 'Was steckt dahinter?', cats: ['Halluzination', 'Kontextfenster', 'Token', 'Agent'], hint: 'Frag dich: Ist etwas erfunden, ist etwas weggefallen, wird etwas gezählt oder handelt die KI selbst?',
       items: [
         {q: 'Die KI nennt eine Studie samt Zeitschrift. Die Studie gibt es nicht.', a: 0, why: 'Die Angabe klingt echt und ist erfunden. Das ist eine Halluzination.'},
         {q: 'Der Chat ist sehr lang. Eine Anweisung vom Anfang wird nicht mehr beachtet.', a: 1, why: 'Ein möglicher Grund: Das Kontextfenster ist voll und frühe Teile fallen weg. Ein neuer Chat mit kurzer Zusammenfassung hilft.'},
@@ -78,7 +78,7 @@ KD.HOUSES = [
   ],
   tasks: [
     {type: 'sim', sim: 'reise', title: 'Reise einer Eingabe', intro: 'Folge einem Satz vom Gerät zum Anbieter und zurück. Leg die Schalter um und sieh, was sich ändert.'},
-    {type: 'sort', title: 'Die Ampel', intro: 'Zieh jede Eingabe auf die passende Farbe oder tippe erst die Karte, dann die Farbe an.', cats: ['Grün: darf hinein', 'Gelb: nur anonymisiert', 'Rot: nie'], colors: ['g', 'y', 'r'], hint: 'Frag dich: Ist eine Person erkennbar? Ist es vertraulich oder schon öffentlich?',
+    {type: 'sort', title: 'Die Ampel', cats: ['Grün: darf hinein', 'Gelb: nur anonymisiert', 'Rot: nie'], colors: ['g', 'y', 'r'], hint: 'Frag dich: Ist eine Person erkennbar? Ist es vertraulich oder schon öffentlich?',
       items: [
         {q: 'Eine veröffentlichte Pressemitteilung deiner Organisation, die du kürzen willst.', a: 0, why: 'Der Text ist bereits öffentlich.'},
         {q: 'Ein Gesprächsprotokoll, in dem noch Namen und Orte stehen.', a: 1, why: 'Erst Namen, Orte und Einrichtungen entfernen, dann in ein freigegebenes Tool.'},
@@ -88,22 +88,22 @@ KD.HOUSES = [
         {q: 'Eine E-Mail einer Klientin, die du beantworten willst.', a: 1, why: 'Beschreib das Anliegen ohne Namen und Details, aus denen sie erkennbar wird.'},
         {q: 'Eine Liste mit Namen und Telefonnummern aller Kursteilnehmer:innen.', a: 2, why: 'Diese Daten braucht die KI für deine Aufgabe nicht. Arbeite mit Platzhaltern.'}
       ]},
-    {type: 'scenario', title: 'Ernstfall', intro: 'Eine kurze Geschichte mit drei Entscheidungen.',
+    {type: 'scenario', title: 'Ernstfall',
       steps: [
-        {t: 'Du willst eine Mail an eine Klientin formulieren lassen und hast aus Gewohnheit ihren vollen Namen und ihre Diagnose in den Chat kopiert. Senden ist schon gedrückt.', opts: [
+        {t: 'Du willst eine Mail an eine Klientin formulieren lassen und hast ihren vollen Namen und ihre Diagnose in den Chat kopiert. Senden ist schon gedrückt.', opts: [
           {t: 'Chat löschen und niemandem etwas sagen.', ok: false, fb: 'Löschen kann sinnvoll sein. Es ersetzt aber die Meldung nicht, und die Organisation erfährt nichts.'},
-          {t: 'Nach der internen Regel melden, zum Beispiel an die Datenschutzbeauftragten.', ok: true, fb: 'Richtig. Wer meldet, gibt der Organisation die Chance zu reagieren. Für sie läuft eine Frist gegenüber der Behörde.'},
+          {t: 'Nach der internen Regel melden, zum Beispiel an die Datenschutzbeauftragten.', ok: true, fb: 'Wer meldet, gibt der Organisation die Chance zu reagieren. Für sie läuft eine Frist gegenüber der Behörde.'},
           {t: 'Abwarten, ob etwas passiert.', ok: false, fb: 'Abwarten nimmt der Organisation die Zeit, die sie zum Reagieren hat.'}]},
         {t: 'Die Datenschutzbeauftragte fragt, ob deine Chats beim Anbieter zum Training verwendet werden dürfen. Wo siehst du nach?', opts: [
-          {t: 'In den Datenschutz-Einstellungen des Tools.', ok: true, fb: 'Richtig. Dort steht der Schalter. Bei Team- und Enterprise-Tarifen gelten die Bedingungen der Organisation.'},
+          {t: 'In den Datenschutz-Einstellungen des Tools.', ok: true, fb: 'Dort steht der Schalter. Bei Team- und Enterprise-Tarifen gelten die Bedingungen der Organisation.'},
           {t: 'Das lässt sich nicht herausfinden.', ok: false, fb: 'Doch. Die Einstellung findest du in den Datenschutz-Einstellungen deines Kontos.'},
           {t: 'Im Chatverlauf.', ok: false, fb: 'Im Verlauf siehst du deine Chats. Die Trainingseinstellung steht in den Datenschutz-Einstellungen.'}]},
         {t: 'Beim nächsten Mal willst du es besser machen. Was gibst du ein?', opts: [
-          {t: '„Eine Klientin möchte ihren Termin verschieben und schlägt nächste Woche vor. Formuliere eine freundliche Antwort.“', ok: true, fb: 'Richtig. Die Aufgabe ist beschrieben, ohne dass jemand erkennbar wird.'},
+          {t: '„Eine Klientin möchte ihren Termin verschieben und schlägt nächste Woche vor. Formuliere eine freundliche Antwort.“', ok: true, fb: 'Die Aufgabe ist beschrieben, ohne dass jemand erkennbar wird.'},
           {t: 'Denselben Text wie vorher, aber in einem Inkognito-Chat.', ok: false, fb: 'Ein Inkognito-Chat landet nicht im Verlauf. Beim Anbieter liegen die Daten trotzdem. Das löst das Problem nicht.'},
           {t: 'Nur den Vornamen und die Diagnose.', ok: false, fb: 'Vorname plus Diagnose kann in einer kleinen Einrichtung reichen, um jemanden zu erkennen.'}]}
       ]},
-    {type: 'sort', title: 'Wahr oder falsch?', intro: 'Aussagen zu Claude, geprüft an den Seiten des Anbieters. Für andere Tools sieh auf deren Hilfeseiten nach.', cats: ['Wahr', 'Falsch'], hint: 'Denk an den Unterschied zwischen Löschen, Verlauf und Training.',
+    {type: 'sort', title: 'Wahr oder falsch?', intro: 'Aussagen zu Claude, geprüft an den Seiten des Anbieters.', cats: ['Wahr', 'Falsch'], hint: 'Denk an den Unterschied zwischen Löschen, Verlauf und Training.',
       items: [
         {q: 'Wenn ich die Trainingseinstellung ausschalte, werden meine bisherigen Chats gelöscht.', a: 1, why: 'Die Einstellung regelt nur die Nutzung zum Verbessern der Modelle. Löschen ist ein eigener Schritt.'},
         {q: 'Die Trainingseinstellung gilt in allen Tarifen auf dieselbe Weise.', a: 1, why: 'Sie betrifft Free, Pro und Max. Für Team und Enterprise gelten eigene Bedingungen: Dort wird laut Anbieter standardmäßig nicht mit den Daten trainiert.'},
@@ -133,7 +133,7 @@ KD.HOUSES = [
     {k: 'Pflege', v: 'Ein Projekt ist nie fertig. Liegen Antworten daneben, ergänzt du die Anweisungen. Leg einen Rhythmus fest, zum Beispiel einmal im Quartal.', ic: 'kalender', src: ['erf']}
   ],
   tasks: [
-    {type: 'order', title: 'Ein Projekt anlegen', intro: 'Bring die Schritte in eine sinnvolle Reihenfolge.', items: ['Aufgabe und Ziel des Projekts in zwei Sätzen festlegen', 'Projekt erstellen und klar benennen', 'Anweisungen eintragen: Rolle, Zielgruppe, Stil, Format, Grenzen', 'Wenige aktuelle Dateien hochladen', 'Testchat mit einer echten Aufgabe führen', 'Anweisungen nach dem Test nachschärfen'], hint: 'Erst denken, dann anlegen, dann füllen, dann testen.', why: 'Wer zuerst das Ziel klärt, lädt nur hoch, was dazu passt. Der Test zeigt, was in den Anweisungen noch fehlt.'},
+    {type: 'order', title: 'Ein Projekt anlegen', items: ['Aufgabe und Ziel des Projekts in zwei Sätzen festlegen', 'Projekt erstellen und klar benennen', 'Anweisungen eintragen: Rolle, Zielgruppe, Stil, Format, Grenzen', 'Wenige aktuelle Dateien hochladen', 'Testchat mit einer echten Aufgabe führen', 'Anweisungen nach dem Test nachschärfen'], hint: 'Erst denken, dann anlegen, dann füllen, dann testen.', why: 'Wer zuerst das Ziel klärt, lädt nur hoch, was dazu passt. Der Test zeigt, was in den Anweisungen noch fehlt.'},
     {type: 'sort', title: 'Gehört das ins Projekt?', intro: 'Du legst ein Projekt für den Newsletter des Beispielvereins an.', cats: ['Hinein', 'Draußen lassen'], colors: ['g', 'r'], hint: 'Frag dich: aktuell, nötig und unbedenklich?',
       items: [
         {q: 'Ziel und Zielgruppe des Newsletters in zwei Sätzen', a: 0, why: 'Ohne Ziel und Zielgruppe muss die KI raten.'},
@@ -144,7 +144,7 @@ KD.HOUSES = [
         {q: 'Die Anweisung: Frag nach, wenn Angaben fehlen', a: 0, why: 'So füllt die KI Lücken nicht mit Erfundenem.'},
         {q: 'Der Styleguide von 2019, der inzwischen ersetzt wurde', a: 1, why: 'Veraltete Fassungen widersprechen den aktuellen Vorgaben.'}
       ]},
-    {type: 'cloze', title: 'Projektanweisung ergänzen', intro: 'Setz die passenden Wörter ein.', text: 'Du schreibst für den Beispielverein. {0}: Mitglieder und ihre Familien. {1}: einmal im Monat über Termine informieren. {2}: herzlich, per Du, kurze Sätze. {3}: höchstens 300 Wörter mit Zwischenüberschriften. Wenn Angaben fehlen, {4}.', blanks: ['Zielgruppe', 'Ziel', 'Stil', 'Format', 'frag nach'], pool: ['Quelle', 'rate'], hint: 'Für wen, wozu, wie klingt es, wie sieht es aus?', why: 'Zielgruppe, Ziel, Stil und Format sind der Kern jeder Projektanweisung. Die letzte Regel verhindert, dass die KI Lücken selbst füllt.'}
+    {type: 'cloze', title: 'Projektanweisung ergänzen', text: 'Du schreibst für den Beispielverein. {0}: Mitglieder und ihre Familien. {1}: einmal im Monat über Termine informieren. {2}: herzlich, per Du, kurze Sätze. {3}: höchstens 300 Wörter mit Zwischenüberschriften. Wenn Angaben fehlen, {4}.', blanks: ['Zielgruppe', 'Ziel', 'Stil', 'Format', 'frag nach'], pool: ['Quelle', 'rate'], hint: 'Für wen, wozu, wie klingt es, wie sieht es aus?', why: 'Zielgruppe, Ziel, Stil und Format sind der Kern jeder Projektanweisung. Die letzte Regel verhindert, dass die KI Lücken selbst füllt.'}
   ],
   einr: {
     title: 'Dein Projekt steht',
@@ -169,7 +169,7 @@ KD.HOUSES = [
     {k: 'Limit erreicht?', v: 'Neuer Chat für ein neues Thema. Nur die nötigen Auszüge einfügen. Oft gebrauchte Dateien ins Projekt legen. Gewünschte Länge angeben.', ic: 'uhr', src: ['anbieter']}
   ],
   tasks: [
-    {type: 'build', title: 'Prompt-Werkstatt: Sommerfest', intro: 'Links steht ein schwacher Prompt. Bau ihn um: Wähle für jeden Baustein die stärkere Formulierung.', weak: 'Schreib eine Einladung zum Sommerfest.',
+    {type: 'build', title: 'Prompt-Werkstatt: Sommerfest', intro: 'Wähle für jeden Baustein die stärkere Formulierung.', weak: 'Schreib eine Einladung zum Sommerfest.',
       slots: [
         {k: 'Rolle', opts: ['Du bist eine KI.', 'Du schreibst für den Beispielverein, einen Nachbarschaftsverein mit 200 Mitgliedern.'], a: 1, why: 'Die Rolle sagt, aus welcher Sicht und für wen geschrieben wird.'},
         {k: 'Aufgabe', opts: ['Schreib eine Einladung zum Sommerfest am 4. Juli um 15 Uhr im Vereinsgarten.', 'Mach was Schönes zum Sommerfest.'], a: 0, why: 'Ein Verb, ein Ergebnis und die Fakten, die sonst erfunden würden.'},
@@ -179,7 +179,7 @@ KD.HOUSES = [
       ],
       result: 'Typisches Ergebnis: eine Einladung mit richtigem Datum, Ort und Anmeldeweg, im Du-Ton, in etwa 80 Wörtern. Ohne die Bausteine entsteht meist ein längerer Text mit erfundenem Datum oder Platzhaltern.',
       criteria: ['Steht drin, was genau entstehen soll?', 'Hat die KI den Kontext, den eine neue Kollegin bräuchte?', 'Sind Länge und Format genannt?', 'Weiß die KI, was sie bei fehlenden Angaben tun soll?']},
-    {type: 'sort', title: 'Welcher Baustein ist das?', intro: 'Ordne jeden Satz einem Baustein zu.', cats: ['Rolle', 'Aufgabe', 'Kontext', 'Format', 'Prüfauftrag'], hint: 'Wer, was, womit, wie, wie abgesichert?',
+    {type: 'sort', title: 'Welcher Baustein ist das?', cats: ['Rolle', 'Aufgabe', 'Kontext', 'Format', 'Prüfauftrag'], hint: 'Wer, was, womit, wie, wie abgesichert?',
       items: [
         {q: '„Du bist Lektor:in für Vereinszeitungen.“', a: 0, why: 'Das legt die Sicht fest, aus der die KI arbeitet.'},
         {q: '„Fasse den Bericht in fünf Punkten zusammen.“', a: 1, why: 'Verb und Ergebnis: Das ist die Aufgabe.'},
@@ -187,7 +187,7 @@ KD.HOUSES = [
         {q: '„Als Tabelle mit drei Spalten, höchstens eine Seite.“', a: 3, why: 'Aufbau und Länge sind Format.'},
         {q: '„Markiere Stellen, bei denen du unsicher bist.“', a: 4, why: 'Das ist ein Prüfauftrag: Die KI soll Unsicheres sichtbar machen.'}
       ]},
-    {type: 'sort', title: 'Schnell oder gründlich?', intro: 'Welches Modell passt? Die Fälle sind bewusst eindeutig. Im Alltag probierst du zuerst das schnellere.', cats: ['Schnelles Modell', 'Gründliches Modell'], hint: 'Wie lang ist der Text, wie viele Bezüge, wie teuer wäre ein Fehler?',
+    {type: 'sort', title: 'Schnell oder gründlich?', intro: 'Im Alltag probierst du zuerst das schnellere.', cats: ['Schnelles Modell', 'Gründliches Modell'], hint: 'Wie lang ist der Text, wie viele Bezüge, wie teuer wäre ein Fehler?',
       items: [
         {q: 'Zehn Betreffzeilen für einen Newsletter vorschlagen.', a: 0, why: 'Kurze, einfache Aufgabe.'},
         {q: 'Einen 40-seitigen Vertragsentwurf auf Widersprüche zwischen den Abschnitten prüfen.', a: 1, why: 'Langer Text, viele Bezüge, Fehler wären teuer.'},
@@ -226,14 +226,14 @@ KD.HOUSES = [
         {t: 'Die Teilnahme ist kostenlos, bitte melden Sie sich bis Freitag unter anmeldung@beispiel.example an.', bad: false, why: 'Konkret: Preis, Frist und Kontakt.'},
         {t: 'Zusammenfassend lässt sich sagen, dass diese Initiative einen wichtigen Beitrag zu einer besseren Zukunft leistet.', bad: true, why: 'Floskel-Schluss. Er behauptet etwas, das nirgends belegt wird.'}
       ]},
-    {type: 'sort', title: 'Welches Muster?', intro: 'Ordne jeden Satz dem Muster zu, das am stärksten auffällt.', cats: ['Floskel-Rahmen', 'Dreierliste', 'Nicht nur, sondern', 'Konkret und in Ordnung'], hint: 'Zähl Aufzählungen, such nach Gegenüberstellungen, prüf Anfang und Schluss.',
+    {type: 'sort', title: 'Welches Muster?', intro: 'Wähle das auffälligste Muster.', cats: ['Floskel-Rahmen', 'Dreierliste', 'Nicht nur, sondern', 'Konkret und in Ordnung'], hint: 'Zähl Aufzählungen, such nach Gegenüberstellungen, prüf Anfang und Schluss.',
       items: [
         {q: '„Abschließend bleibt festzuhalten, dass Zusammenarbeit der Schlüssel zum Erfolg ist.“', a: 0, why: 'Ein Schlusssatz, der nur zusammenfasst und zu allem passt.'},
         {q: '„Wir arbeiten transparent, innovativ und zukunftsorientiert.“', a: 1, why: 'Drei Schlagwörter ohne Beleg.'},
         {q: '„Es geht nicht nur um Zahlen, sondern um Menschen.“', a: 2, why: 'Gegenüberstellung, die groß klingt und offen lässt, was gemeint ist.'},
         {q: '„Im Oktober kamen 43 Personen zur Sprechstunde, zwölf mehr als im September.“', a: 3, why: 'Zahl, Zeitraum, Vergleich: konkret.'}
       ]},
-    {type: 'cloze', title: 'Slop überarbeiten', intro: 'Mach aus dem leeren Satz einen konkreten. Setz ein.', text: 'Vorher: „Unser Angebot schafft echten Mehrwert für alle Beteiligten.“ Nachher: „Seit {0} berät unser Team {1} kostenlos zu {2}. Anmeldung unter {3}.“', blanks: ['März', 'jeden Dienstag', 'Mietfragen', 'beratung@beispiel.example'], pool: ['nachhaltig', 'ganzheitlich'], hint: 'Wann, wie oft, wozu, wie erreichbar?', why: 'Zeitpunkt, Häufigkeit, Thema und Kontakt ersetzen das Wort „Mehrwert“. Die Angaben musst du selbst liefern, die KI kennt sie nicht.'}
+    {type: 'cloze', title: 'Slop überarbeiten', intro: 'Mach aus dem leeren Satz einen konkreten.', text: 'Vorher: „Unser Angebot schafft echten Mehrwert für alle Beteiligten.“ Nachher: „Seit {0} berät unser Team {1} kostenlos zu {2}. Anmeldung unter {3}.“', blanks: ['März', 'jeden Dienstag', 'Mietfragen', 'beratung@beispiel.example'], pool: ['nachhaltig', 'ganzheitlich'], hint: 'Wann, wie oft, wozu, wie erreichbar?', why: 'Zeitpunkt, Häufigkeit, Thema und Kontakt ersetzen das Wort „Mehrwert“. Die Angaben musst du selbst liefern, die KI kennt sie nicht.'}
   ],
   einr: {
     title: 'Dein Detektivbüro ist eingerichtet',
@@ -257,7 +257,7 @@ KD.HOUSES = [
     {k: 'Grenzen', v: 'Deine eigenen Texte bleiben der Maßstab. Was du nicht selbst gelesen hast, schickst du nicht ab.', ic: 'stopp'}
   ],
   tasks: [
-    {type: 'sort', title: 'Welche Texte taugen?', intro: 'Du sammelst Texte für dein Stilprofil.', cats: ['Verwenden', 'Weglassen'], colors: ['g', 'r'], hint: 'Selbst geschrieben? Ohne KI? Frei von vertraulichen Angaben?',
+    {type: 'sort', title: 'Welche Texte taugen für dein Stilprofil?', cats: ['Verwenden', 'Weglassen'], colors: ['g', 'r'], hint: 'Selbst geschrieben? Ohne KI? Frei von vertraulichen Angaben?',
       items: [
         {q: 'Ein LinkedIn-Beitrag, den du 2022 selbst geschrieben hast.', a: 0, why: 'Eigener Text ohne KI-Hilfe.'},
         {q: 'Ein Newsletter, den ein KI-Tool für dich formuliert hat.', a: 1, why: 'Das Profil würde KI-Muster lernen.'},
@@ -266,8 +266,8 @@ KD.HOUSES = [
         {q: 'Eine E-Mail von dir, aus der du Namen und Details entfernt hast.', a: 0, why: 'Eigener Text, vorher anonymisiert.'},
         {q: 'Ein Text, den du mit einem KI-Tool „verbessert“ hast.', a: 1, why: 'Darin steckt nicht mehr nur dein Stil.'}
       ]},
-    {type: 'order', title: 'Vom Text zum Profil', intro: 'Bring die Schritte in eine sinnvolle Reihenfolge.', items: ['Eigene Texte sammeln, die ohne KI entstanden sind', 'Namen und Vertrauliches entfernen', 'Die KI den Stil beschreiben lassen, mit Belegstellen', 'Beschreibung lesen und korrigieren', 'Profil als Datei oder Projektanweisung speichern', 'Testtext schreiben lassen und mit einem eigenen vergleichen'], hint: 'Erst sammeln und bereinigen, dann analysieren, dann prüfen.', why: 'Die Korrektur vor dem Speichern ist wichtig: Die KI beschreibt deinen Stil manchmal freundlicher oder glatter, als er ist.'},
-    {type: 'build', title: 'Prompt-Werkstatt: Stilprofil', intro: 'Bau den Auftrag für dein Stilprofil.', weak: 'Analysiere meinen Schreibstil.',
+    {type: 'order', title: 'Vom Text zum Profil', items: ['Eigene Texte sammeln, die ohne KI entstanden sind', 'Namen und Vertrauliches entfernen', 'Die KI den Stil beschreiben lassen, mit Belegstellen', 'Beschreibung lesen und korrigieren', 'Profil als Datei oder Projektanweisung speichern', 'Testtext schreiben lassen und mit einem eigenen vergleichen'], hint: 'Erst sammeln und bereinigen, dann analysieren, dann prüfen.', why: 'Die Korrektur vor dem Speichern ist wichtig: Die KI beschreibt deinen Stil manchmal freundlicher oder glatter, als er ist.'},
+    {type: 'build', title: 'Prompt-Werkstatt: Stilprofil', weak: 'Analysiere meinen Schreibstil.',
       slots: [
         {k: 'Aufgabe', opts: ['Beschreibe meinen Schreibstil als Anweisung für eine KI.', 'Sag mir, wie ich schreibe.'], a: 0, why: 'Das Ergebnis soll später als Anweisung dienen. Das muss im Auftrag stehen.'},
         {k: 'Kontext', opts: ['Hier sind Texte.', 'Hier sind sieben Texte, die ich selbst und ohne KI geschrieben habe: drei E-Mails, zwei Beiträge, zwei Berichte.'], a: 1, why: 'Anzahl, Herkunft und Art der Texte helfen der KI, Muster von Zufall zu trennen.'},
@@ -298,8 +298,8 @@ KD.HOUSES = [
     {k: 'Nicht auffindbar?', v: 'Dann gilt die Aussage als unbelegt: streichen oder so kennzeichnen. Überleg, welche Art von Quelle nötig wäre.', ic: 'stopp'}
   ],
   tasks: [
-    {type: 'order', title: 'Die Prüfroutine', intro: 'Bring die Schritte in die richtige Reihenfolge.', items: ['Quelle mit Titel, Herausgeber und Datum verlangen', 'Original selbst öffnen', 'Zahl oder Satz im Original suchen', 'Stand prüfen: Gibt es eine neuere Fassung?', 'Für Wichtiges eine zweite Quelle suchen', 'Was offen bleibt, als unbelegt kennzeichnen'], hint: 'Vom Verlangen über das Öffnen zum Vergleichen.', why: 'Erst wenn du die Aussage im Original gefunden hast, lohnt sich die Frage nach Stand und zweiter Quelle.'},
-    {type: 'sort', title: 'Übernehmen oder nicht?', intro: 'Eine KI hat diese Aussagen mit Quellen geliefert. Du hast jede geprüft, die Prüfnotiz steht dabei.', cats: ['Übernehmen', 'Nicht übernehmen'], colors: ['g', 'r'], hint: 'Lies die Prüfnotiz genau: Existiert die Quelle, steht es dort, ist sie aktuell?',
+    {type: 'order', title: 'Die Prüfroutine', items: ['Quelle mit Titel, Herausgeber und Datum verlangen', 'Original selbst öffnen', 'Zahl oder Satz im Original suchen', 'Stand prüfen: Gibt es eine neuere Fassung?', 'Für Wichtiges eine zweite Quelle suchen', 'Was offen bleibt, als unbelegt kennzeichnen'], hint: 'Vom Verlangen über das Öffnen zum Vergleichen.', why: 'Erst wenn du die Aussage im Original gefunden hast, lohnt sich die Frage nach Stand und zweiter Quelle.'},
+    {type: 'sort', title: 'Übernehmen oder nicht?', intro: 'Entscheide anhand der Prüfnotiz.', cats: ['Übernehmen', 'Nicht übernehmen'], colors: ['g', 'r'], hint: 'Lies die Prüfnotiz genau: Existiert die Quelle, steht es dort, ist sie aktuell?',
       items: [
         {q: 'Laut einer Befragung nutzen 62 % der Menschen im Beispielland Gesundheitsinformationen zuerst online.', d: [['Quelle laut KI', 'Institut für Gesundheitskommunikation Musterstadt, 2025'], ['Prüfnotiz', 'Link geöffnet. Titel und Herausgeber stimmen, die Zahl steht auf Seite 4.']], a: 0, why: 'Existenz, Zahl und Datum stimmen mit dem Original überein.'},
         {q: 'Eine Metaanalyse von 2024 belegt, dass Erinnerungsnachrichten die Teilnahme klar erhöhen.', d: [['Quelle laut KI', 'Dr. H. Lindner, „Reminder Effects Revisited“, 2024'], ['Prüfnotiz', 'Weder beim Verlag noch in der Fachdatenbank gibt es einen Eintrag zu Titel oder Autor.']], a: 1, why: 'Erfundene Quelle. Ohne auffindbare Quelle darf die Aussage nicht übernommen werden.'},
@@ -308,7 +308,7 @@ KD.HOUSES = [
         {q: 'Die Fachgesellschaft empfiehlt, Patient:innen schriftlich zu informieren.', d: [['Quelle laut KI', 'Fachgesellschaft Muster, Empfehlung zur Patienteninformation'], ['Prüfnotiz', 'Der Link führt auf die Startseite. Eine solche Empfehlung steht dort nirgends.']], a: 1, why: 'Link ohne Beleg. Die Seite existiert, die Aussage nicht.'},
         {q: 'Das Ministerium im Beispielland veröffentlichte 2025 einen Bericht zur Versorgungslage.', d: [['Quelle laut KI', 'Ministerium für Gesundheit Beispielland, Versorgungsbericht 2025'], ['Prüfnotiz', 'Link geöffnet, die Aussage steht auf Seite 12. Ein Fachmedium berichtet unabhängig dasselbe.']], a: 0, why: 'Original gefunden und von einer zweiten Quelle bestätigt.'}
       ]},
-    {type: 'sort', title: 'Was ist hier das Original?', intro: 'Ordne jede Quelle ein.', cats: ['Primärquelle', 'Sekundärquelle'], hint: 'Stammt die Aussage von dort oder wird dort über sie berichtet?',
+    {type: 'sort', title: 'Was ist hier das Original?', cats: ['Primärquelle', 'Sekundärquelle'], hint: 'Stammt die Aussage von dort oder wird dort über sie berichtet?',
       items: [
         {q: 'Der Gesetzestext im Amtsblatt.', a: 0, why: 'Das Gesetz selbst ist das Original.'},
         {q: 'Ein Blogbeitrag, der das Gesetz zusammenfasst.', a: 1, why: 'Eine Zusammenfassung kann verkürzen oder irren.'},
